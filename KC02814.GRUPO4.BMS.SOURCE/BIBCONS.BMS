@@ -1,0 +1,33 @@
+BIBCONS DFHMSD TYPE=&SYSPARM,MODE=INOUT,LANG=COBOL,CTRL=FREEKB,        X
+               TIOAPFX=YES
+CONS    DFHMDI SIZE=(24,80),LINE=1,COLUMN=1
+         DFHMDF POS=(01,25),LENGTH=30,                                 X
+               ATTRB=(BRT,PROT),                                       X
+               INITIAL='*** CONSULTA DE LIBROS ***'
+         DFHMDF POS=(03,02),LENGTH=76,                                 X
+               ATTRB=(NORM,PROT),                                      X
+               INITIAL='CODIGO      TITULO               AUTOR          X
+               ANIO STK UBIC'
+
+* --- AREA DE LISTADO DE LIBROS (10 lineas)
+MENSAJE1 DFHMDF POS=(05,1),LENGTH=78,ATTRB=(NORM,PROT),INITIAL=' '
+MENSAJE2 DFHMDF POS=(06,1),LENGTH=78,ATTRB=(NORM,PROT),INITIAL=' '
+MENSAJE3 DFHMDF POS=(07,1),LENGTH=78,ATTRB=(NORM,PROT),INITIAL=' '
+MENSAJE4 DFHMDF POS=(08,1),LENGTH=78,ATTRB=(NORM,PROT),INITIAL=' '
+MENSAJE5 DFHMDF POS=(09,1),LENGTH=78,ATTRB=(NORM,PROT),INITIAL=' '
+MENSAJE6 DFHMDF POS=(10,1),LENGTH=78,ATTRB=(NORM,PROT),INITIAL=' '
+MENSAJE7 DFHMDF POS=(11,1),LENGTH=78,ATTRB=(NORM,PROT),INITIAL=' '
+MENSAJE8 DFHMDF POS=(12,1),LENGTH=78,ATTRB=(NORM,PROT),INITIAL=' '
+MENSAJE9 DFHMDF POS=(13,1),LENGTH=78,ATTRB=(NORM,PROT),INITIAL=' '
+MENSAJE10 DFHMDF POS=(14,1),LENGTH=78,ATTRB=(NORM,PROT),INITIAL=' '
+
+         DFHMDF POS=(22,10),LENGTH=50,                                 X
+               ATTRB=(BRT,PROT),                                       X
+               INITIAL='TODO: AGREGAR CAMPOS DE BUSQUEDA AQUI'
+
+         DFHMDF POS=(24,10),LENGTH=50,                                 X
+               ATTRB=(NORM,PROT),                                      X
+               INITIAL='PF3=VOLVER AL MENU  PF7=ANTERIOR PF8=SIGUIENTE'
+
+         DFHMSD TYPE=FINAL
+         END

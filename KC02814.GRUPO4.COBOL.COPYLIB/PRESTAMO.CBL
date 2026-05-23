@@ -1,7 +1,7 @@
       *****************************************************************
       * COPYBOOK: PRESTAMO                                            *
       * PROPOSITO: ESTRUCTURA DE DATOS PARA PRESTAMOS                 *
-      * AUTOR: ESTUDIANTE KC03XXX                                     *
+      * AUTOR: GRUPO 4                                                *
       * FECHA: 23/05/2026                                             *
       * VERSION: 1.0                                                  *
       *****************************************************************

@@ -1,7 +1,7 @@
       *****************************************************************
       * COPYBOOK: CONSTANT                                            *
       * PROPOSITO: CONSTANTES DEL SISTEMA DE BIBLIOTECA               *
-      * AUTOR: ESTUDIANTE KC03XXX                                     *
+      * AUTOR: GRUPO 4                                                *
       * FECHA: 23/05/2026                                             *
       * VERSION: 1.0                                                  *
       *****************************************************************

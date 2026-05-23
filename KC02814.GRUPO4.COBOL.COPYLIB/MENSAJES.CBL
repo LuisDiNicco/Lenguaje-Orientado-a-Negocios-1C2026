@@ -1,7 +1,7 @@
       *****************************************************************
       * COPYBOOK: MENSAJES                                            *
       * PROPOSITO: MENSAJES DEL SISTEMA                               *
-      * AUTOR: ESTUDIANTE KC03XXX                                     *
+      * AUTOR: GRUPO 4                                                *
       * FECHA: 23/05/2026                                             *
       * VERSION: 1.0                                                  *
       *****************************************************************
