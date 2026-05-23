@@ -2,7 +2,7 @@
       * COPYBOOK: MENSAJES                                            *
       * PROPOSITO: MENSAJES DEL SISTEMA                               *
       * AUTOR: ESTUDIANTE KC03XXX                                     *
-      * FECHA: 15/03/2025                                             *
+      * FECHA: 23/05/2026                                             *
       * VERSION: 1.0                                                  *
       *****************************************************************
       *
