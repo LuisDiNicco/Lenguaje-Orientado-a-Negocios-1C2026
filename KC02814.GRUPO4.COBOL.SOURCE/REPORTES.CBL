@@ -1,0 +1,240 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. REPORTES.
+       AUTHOR. GRUPO 4.
+       DATE-WRITTEN. 06/06/2026.
+      *****************************************************************
+      * PROGRAMA: REPORTES - GENERACION DE REPORTES ESTADISTICOS      *
+      * DESCRIPCION: GENERA 4 REPORTES DESDE DB2:                     *
+      *              1. LIBROS MAS PRESTADOS                          *
+      *              2. USUARIOS CON PRESTAMOS VENCIDOS               *
+      *              3. ESTADISTICAS MENSUALES                        *
+      *              4. INVENTARIO POR CATEGORIA                      *
+      *****************************************************************
+
+       ENVIRONMENT DIVISION.
+       CONFIGURATION SECTION.
+       SOURCE-COMPUTER. IBM-3090.
+       OBJECT-COMPUTER. IBM-3090.
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+           SELECT ARCHIVO-REPORTE ASSIGN TO REPORTE
+                  ORGANIZATION IS SEQUENTIAL
+                  ACCESS MODE IS SEQUENTIAL
+                  FILE STATUS IS WS-STATUS-REPORTE.
+
+       DATA DIVISION.
+       FILE SECTION.
+       FD  ARCHIVO-REPORTE
+           RECORDING MODE IS F
+           RECORD CONTAINS 133 CHARACTERS
+           BLOCK CONTAINS 0 RECORDS
+           DATA RECORD IS REG-REPORTE.
+       01  REG-REPORTE                  PIC X(133).
+
+       WORKING-STORAGE SECTION.
+      *
+      * CONSTANTES Y VARIABLES DEL SISTEMA
+      *
+           COPY CONSTANT.
+           COPY MENSAJES.
+           COPY PRESTAMO.
+      *
+      * DECLARACIONES DB2
+      *
+           EXEC SQL INCLUDE SQLCA END-EXEC.
+      *
+      * CONTADORES Y CONTROL
+      *
+       01  WS-CONTADORES.
+           05 WS-CONT-REPORTES-GEN      PIC 9(2) VALUE ZERO.
+      *
+      * FILE STATUS
+      *
+       01  WS-FILE-STATUS.
+           05 WS-STATUS-REPORTE         PIC X(2) VALUE '00'.
+              88 WS-REPORTE-OK          VALUE '00'.
+      *
+      * LINEAS DE REPORTE
+      *
+           COPY LINREP.
+      *
+       01  WS-FECHA-PROCESO             PIC X(10).
+       01  WS-NUMERO-PAGINA             PIC 9(3) VALUE 1.
+       01  WS-CONTADOR-LINEAS           PIC 9(2) VALUE 99.
+      *
+      * VARIABLES HOST DB2 PARA CURSORES
+      *
+       01  WS-LIBRO-REPORTE.
+           05 WS-LR-CODIGO              PIC X(10).
+           05 WS-LR-TITULO              PIC X(60).
+           05 WS-LR-AUTOR               PIC X(40).
+           05 WS-LR-CATEGORIA           PIC X(20).
+           05 WS-LR-STOCK-TOTAL         PIC 9(3).
+           05 WS-LR-STOCK-DISPONIBLE    PIC 9(3).
+           05 WS-LR-CANT-PRESTAMOS      PIC 9(7).
+      *
+       01  WS-PRESTAMO-REPORTE.
+           05 WS-PR-COD-USUARIO         PIC X(10).
+           05 WS-PR-NOMBRE-USUARIO      PIC X(60).
+           05 WS-PR-COD-LIBRO           PIC X(10).
+           05 WS-PR-TITULO-LIBRO        PIC X(60).
+           05 WS-PR-FECHA-LIMITE        PIC X(10).
+           05 WS-PR-DIAS-ATRASO         PIC 9(4).
+           05 WS-PR-MULTA               PIC 9(5)V99.
+      *
+       01  WS-ESTADISTICA.
+           05 WS-EST-ANIO               PIC 9(4).
+           05 WS-EST-MES                PIC 9(2).
+           05 WS-EST-PRESTAMOS          PIC 9(7).
+           05 WS-EST-DEVOLUCIONES       PIC 9(7).
+           05 WS-EST-MULTAS             PIC 9(7)V99.
+      *
+       01  WS-INVENTARIO.
+           05 WS-INV-CATEGORIA          PIC X(20).
+           05 WS-INV-TOTAL-LIBROS       PIC 9(7).
+           05 WS-INV-STOCK-TOTAL        PIC 9(7).
+           05 WS-INV-STOCK-DISPONIBLE   PIC 9(7).
+           05 WS-INV-PRESTADOS          PIC 9(7).
+
+       PROCEDURE DIVISION.
+      *
+       MAIN-PROGRAM.
+           PERFORM INICIALIZAR
+           PERFORM GENERAR-REPORTES
+           PERFORM FINALIZAR
+           STOP RUN.
+      *
+       INICIALIZAR.
+           DISPLAY 'INICIANDO PROGRAMA REPORTES'
+           PERFORM OBTENER-FECHA-PROCESO
+           PERFORM ABRIR-ARCHIVOS.
+      *
+       GENERAR-REPORTES.
+           PERFORM REPORTE-LIBROS-MAS-PRESTADOS
+           PERFORM REPORTE-USUARIOS-MOROSOS
+           PERFORM REPORTE-ESTADISTICAS-MENSUALES
+           PERFORM REPORTE-INVENTARIO-CATEGORIA.
+      *
+       FINALIZAR.
+           PERFORM CERRAR-ARCHIVOS
+           DISPLAY 'REPORTES GENERADOS: ' WS-CONT-REPORTES-GEN
+           DISPLAY 'PROGRAMA TERMINADO NORMALMENTE'.
+      *
+      * RUTINAS DE ARCHIVO
+      *
+       ABRIR-ARCHIVOS.
+           OPEN OUTPUT ARCHIVO-REPORTE
+           IF NOT WS-REPORTE-OK
+               DISPLAY 'ERROR AL ABRIR ARCHIVO REPORTE: '
+                       WS-STATUS-REPORTE
+               STOP RUN
+           END-IF.
+      *
+       CERRAR-ARCHIVOS.
+           CLOSE ARCHIVO-REPORTE.
+      *
+      * REPORTE 1: TOP 10 LIBROS MAS PRESTADOS
+      *
+       REPORTE-LIBROS-MAS-PRESTADOS.
+           DISPLAY 'GENERANDO REPORTE: LIBROS MAS PRESTADOS'
+           PERFORM ESCRIBIR-CABECERA-REPORTE
+      *    TODO: EXEC SQL DECLARE CURSOR C1 CURSOR FOR
+      *          SELECT L.LIB_CODIGO, L.LIB_TITULO, L.LIB_AUTOR,
+      *                 COUNT(*) AS CANT_PRESTAMOS
+      *          FROM KC02814.LIBROS L
+      *          JOIN KC02814.PRESTAMOS P
+      *            ON L.LIB_CODIGO = P.PRES_CODIGO_LIBRO
+      *          GROUP BY L.LIB_CODIGO, L.LIB_TITULO, L.LIB_AUTOR
+      *          ORDER BY CANT_PRESTAMOS DESC
+      *          FETCH FIRST 10 ROWS ONLY
+      *    TODO: FETCH LOOP Y ESCRIBIR CADA LINEA
+           DISPLAY 'REPORTE 1: TOP 10 LIBROS MAS PRESTADOS'
+           ADD 1 TO WS-CONT-REPORTES-GEN.
+      *
+      * REPORTE 2: USUARIOS CON PRESTAMOS VENCIDOS
+      *
+       REPORTE-USUARIOS-MOROSOS.
+           DISPLAY 'GENERANDO REPORTE: USUARIOS CON PRESTAMOS VENCIDOS'
+      *    TODO: EXEC SQL DECLARE CURSOR C2 CURSOR FOR
+      *          SELECT U.USU_CODIGO, U.USU_NOMBRE, U.USU_APELLIDO,
+      *                 P.PRES_CODIGO_LIBRO, L.LIB_TITULO,
+      *                 P.PRES_FECHA_LIMITE
+      *          FROM KC02814.USUARIOS U
+      *          JOIN KC02814.PRESTAMOS P
+      *            ON U.USU_CODIGO = P.PRES_CODIGO_USUARIO
+      *          JOIN KC02814.LIBROS L
+      *            ON P.PRES_CODIGO_LIBRO = L.LIB_CODIGO
+      *          WHERE P.PRES_ESTADO = 'V'
+      *             OR (P.PRES_ESTADO = 'P'
+      *                 AND P.PRES_FECHA_LIMITE < CURRENT DATE)
+      *          ORDER BY P.PRES_FECHA_LIMITE
+      *    TODO: FETCH LOOP Y ESCRIBIR DETALLE
+           DISPLAY 'REPORTE 2: USUARIOS CON PRESTAMOS VENCIDOS'
+           ADD 1 TO WS-CONT-REPORTES-GEN.
+      *
+      * REPORTE 3: ESTADISTICAS MENSUALES
+      *
+       REPORTE-ESTADISTICAS-MENSUALES.
+           DISPLAY 'GENERANDO REPORTE: ESTADISTICAS MENSUALES'
+      *    TODO: EXEC SQL DECLARE CURSOR C3 CURSOR FOR
+      *          SELECT YEAR(PRES_FECHA_PRESTAMO) AS ANIO,
+      *                 MONTH(PRES_FECHA_PRESTAMO) AS MES,
+      *                 COUNT(CASE WHEN PRES_ESTADO IN ('P','D','V')
+      *                       THEN 1 END) AS TOTAL_PRESTAMOS,
+      *                 COUNT(CASE WHEN PRES_ESTADO = 'D'
+      *                       THEN 1 END) AS TOTAL_DEVOLUCIONES,
+      *                 SUM(PRES_MULTA) AS TOTAL_MULTAS
+      *          FROM KC02814.PRESTAMOS
+      *          GROUP BY YEAR(PRES_FECHA_PRESTAMO),
+      *                   MONTH(PRES_FECHA_PRESTAMO)
+      *          ORDER BY ANIO, MES
+      *    TODO: FETCH LOOP Y ESCRIBIR DETALLE
+           DISPLAY 'REPORTE 3: ESTADISTICAS MENSUALES'
+           ADD 1 TO WS-CONT-REPORTES-GEN.
+      *
+      * REPORTE 4: INVENTARIO POR CATEGORIA
+      *
+       REPORTE-INVENTARIO-CATEGORIA.
+           DISPLAY 'GENERANDO REPORTE: INVENTARIO POR CATEGORIA'
+      *    TODO: EXEC SQL DECLARE CURSOR C4 CURSOR FOR
+      *          SELECT L.LIB_CATEGORIA,
+      *                 COUNT(*) AS TOTAL_LIBROS,
+      *                 SUM(L.LIB_STOCK_TOTAL) AS STOCK_TOTAL,
+      *                 SUM(L.LIB_STOCK_DISPONIBLE) AS STOCK_DISP,
+      *                 SUM(L.LIB_STOCK_TOTAL - L.LIB_STOCK_DISPONIBLE)
+      *                   AS PRESTADOS
+      *          FROM KC02814.LIBROS L
+      *          WHERE L.LIB_ESTADO = 'A'
+      *          GROUP BY L.LIB_CATEGORIA
+      *          ORDER BY L.LIB_CATEGORIA
+      *    TODO: FETCH LOOP Y ESCRIBIR DETALLE
+           DISPLAY 'REPORTE 4: INVENTARIO POR CATEGORIA'
+           ADD 1 TO WS-CONT-REPORTES-GEN.
+      *
+      * RUTINAS DE REPORTE COMUNES
+      *
+       ESCRIBIR-CABECERA-REPORTE.
+           IF WS-CONTADOR-LINEAS > 55
+               PERFORM SALTO-PAGINA
+           END-IF.
+      *
+       SALTO-PAGINA.
+           WRITE REG-REPORTE FROM LINEA-CABECERA-1 AFTER ADVANCING PAGE
+           WRITE REG-REPORTE FROM LINEA-CABECERA-2
+                 AFTER ADVANCING 1 LINE
+           MOVE WS-FECHA-PROCESO TO LIN-FECHA
+           MOVE 'REPORTE ESTADISTICO BIBLIOTECA'
+                 TO LIN-TITULO-REPORTE
+           MOVE WS-NUMERO-PAGINA TO LIN-NUMERO-PAGINA
+           WRITE REG-REPORTE FROM LINEA-CABECERA-3
+                 AFTER ADVANCING 2 LINES
+           WRITE REG-REPORTE FROM LINEA-SEPARADOR
+                 AFTER ADVANCING 1 LINE
+           MOVE 1 TO WS-CONTADOR-LINEAS
+           ADD 1 TO WS-NUMERO-PAGINA.
+      *
+      * RUTINAS DE UTILIDAD
+      *
+       OBTENER-FECHA-PROCESO.
+           ACCEPT WS-FECHA-PROCESO FROM DATE YYYYMMDD
+           INSPECT WS-FECHA-PROCESO REPLACING ALL '/' BY '-'.

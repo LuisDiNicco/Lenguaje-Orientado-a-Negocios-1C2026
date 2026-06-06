@@ -1,0 +1,329 @@
+       IDENTIFICATION DIVISION.
+       PROGRAM-ID. PRESTAM.
+       AUTHOR. GRUPO 4.
+       DATE-WRITTEN. 06/06/2026.
+       DATE-COMPILED.
+      *****************************************************************
+      * PROGRAMA: PRESTAM - PROCESAMIENTO DE PRESTAMOS Y DEVOLUCIONES *
+      * DESCRIPCION: PROCESA TRANSACCIONES DE PRESTAMO/DEVOLUCION     *
+      *              VALIDA REGLAS DE NEGOCIO Y ACTUALIZA DB2          *
+      *****************************************************************
+
+       ENVIRONMENT DIVISION.
+       CONFIGURATION SECTION.
+       SOURCE-COMPUTER. IBM-3090.
+       OBJECT-COMPUTER. IBM-3090.
+       INPUT-OUTPUT SECTION.
+       FILE-CONTROL.
+           SELECT ARCHIVO-TRANSACCIONES ASSIGN TO TRANSAC
+                  ORGANIZATION IS SEQUENTIAL
+                  ACCESS MODE IS SEQUENTIAL
+                  FILE STATUS IS WS-STATUS-TRANS.
+
+           SELECT ARCHIVO-REPORTE ASSIGN TO REPORTE
+                  ORGANIZATION IS SEQUENTIAL
+                  ACCESS MODE IS SEQUENTIAL
+                  FILE STATUS IS WS-STATUS-REPORTE.
+
+       DATA DIVISION.
+       FILE SECTION.
+       FD  ARCHIVO-TRANSACCIONES
+           RECORD CONTAINS 150 CHARACTERS
+           BLOCK CONTAINS 0 RECORDS
+           DATA RECORD IS REG-TRANSACCION.
+       01  REG-TRANSACCION              PIC X(150).
+
+       FD  ARCHIVO-REPORTE
+           RECORDING MODE IS F
+           RECORD CONTAINS 133 CHARACTERS
+           BLOCK CONTAINS 0 RECORDS
+           DATA RECORD IS REG-REPORTE.
+       01  REG-REPORTE                  PIC X(133).
+
+       WORKING-STORAGE SECTION.
+      *
+      * CONSTANTES Y VARIABLES DEL SISTEMA
+      *
+           COPY CONSTANT.
+           COPY MENSAJES.
+           COPY PRESTAMO.
+      *
+      * CONTADORES Y CONTROL
+      *
+       01  WS-CONTADORES.
+           05 WS-CONT-LEIDOS            PIC 9(7) VALUE ZERO.
+           05 WS-CONT-PROCESADOS        PIC 9(7) VALUE ZERO.
+           05 WS-CONT-ERRORES           PIC 9(7) VALUE ZERO.
+           05 WS-CONT-PRESTAMOS         PIC 9(7) VALUE ZERO.
+           05 WS-CONT-DEVOLUCIONES      PIC 9(7) VALUE ZERO.
+      *
+      * VARIABLES DE CONTROL
+      *
+       01  WS-CONTROL.
+           05 WS-FIN-ARCHIVO            PIC X(1) VALUE 'N'.
+              88 WS-FIN-ARCHIVO-SI      VALUE 'S'.
+           05 WS-RESULTADO              PIC X(1) VALUE 'N'.
+              88 WS-RESULTADO-OK        VALUE 'S'.
+      *
+      * FILE STATUS
+      *
+       01  WS-FILE-STATUS.
+           05 WS-STATUS-TRANS           PIC X(2) VALUE '00'.
+              88 WS-TRANS-OK            VALUE '00'.
+              88 WS-TRANS-EOF           VALUE '10'.
+           05 WS-STATUS-REPORTE         PIC X(2) VALUE '00'.
+              88 WS-REPORTE-OK          VALUE '00'.
+      *
+      * REGISTRO DE TRANSACCION ENTRADA
+      *
+       01  WS-TRANSACCION.
+           05 WS-TRANS-TIPO             PIC X(1).
+              88 TRANS-PRESTAMO         VALUE 'P'.
+              88 TRANS-DEVOLUCION       VALUE 'D'.
+           05 FILLER                    PIC X(1).
+           05 WS-TRANS-COD-USUARIO      PIC X(10).
+           05 FILLER                    PIC X(1).
+           05 WS-TRANS-COD-LIBRO        PIC X(10).
+           05 FILLER                    PIC X(1).
+           05 WS-TRANS-FECHA            PIC X(10).
+           05 FILLER                    PIC X(116).
+      *
+      * AREAS DE TRABAJO PARA REGLAS DE NEGOCIO
+      *
+       01  WS-DIAS-PRESTAMO             PIC 9(2).
+       01  WS-MAX-LIBROS                PIC 9(2).
+       01  WS-LIBROS-ACTUALES           PIC 9(2) VALUE ZERO.
+       01  WS-STOCK-DISPONIBLE          PIC 9(3) VALUE ZERO.
+       01  WS-FECHA-DEVOLUCION          PIC X(10).
+       01  WS-FECHA-LIMITE              PIC X(10).
+       01  WS-FECHA-PROCESO             PIC X(10).
+       01  WS-MULTA-CALCULADA           PIC 9(5)V99 VALUE ZERO.
+      *
+      * LINEAS DE REPORTE
+      *
+           COPY LINREP.
+      *
+       01  WS-NUMERO-PAGINA             PIC 9(3) VALUE 1.
+       01  WS-CONTADOR-LINEAS           PIC 9(2) VALUE 99.
+
+      * TODO: AGREGAR DECLARACIONES DB2 (EXEC SQL INCLUDE SQLCA)
+
+       PROCEDURE DIVISION.
+      *
+      * PROGRAMA PRINCIPAL
+      *
+       MAIN-PROGRAM.
+           PERFORM INICIALIZAR
+           PERFORM PROCESAR-TRANSACCIONES
+           PERFORM FINALIZAR
+           STOP RUN.
+      *
+       INICIALIZAR.
+           DISPLAY 'INICIANDO PROGRAMA PRESTAM'
+           PERFORM OBTENER-FECHA-PROCESO
+           PERFORM ABRIR-ARCHIVOS
+           PERFORM ESCRIBIR-CABECERA-REPORTE.
+      *
+       PROCESAR-TRANSACCIONES.
+           PERFORM LEER-TRANSACCION
+           PERFORM UNTIL WS-FIN-ARCHIVO-SI
+               MOVE 'S' TO WS-RESULTADO
+               EVALUATE TRUE
+                   WHEN TRANS-PRESTAMO
+                        PERFORM PROCESAR-PRESTAMO
+                   WHEN TRANS-DEVOLUCION
+                        PERFORM PROCESAR-DEVOLUCION
+                   WHEN OTHER
+                        MOVE 'N' TO WS-RESULTADO
+                        DISPLAY 'TIPO TRANSACCION INVALIDO: '
+                                WS-TRANS-TIPO
+               END-EVALUATE
+               IF WS-RESULTADO-OK
+                   ADD 1 TO WS-CONT-PROCESADOS
+               ELSE
+                   ADD 1 TO WS-CONT-ERRORES
+               END-IF
+               PERFORM LEER-TRANSACCION
+           END-PERFORM.
+      *
+       FINALIZAR.
+           PERFORM ESCRIBIR-TOTALES
+           PERFORM CERRAR-ARCHIVOS
+           DISPLAY 'TRANSACCIONES LEIDAS: ' WS-CONT-LEIDOS
+           DISPLAY 'PRESTAMOS PROCESADOS: ' WS-CONT-PRESTAMOS
+           DISPLAY 'DEVOLUCIONES PROCESADAS: ' WS-CONT-DEVOLUCIONES
+           DISPLAY 'TRANSACCIONES CON ERROR: ' WS-CONT-ERRORES
+           DISPLAY 'PROGRAMA TERMINADO NORMALMENTE'.
+      *
+      * RUTINAS DE ARCHIVO
+      *
+       ABRIR-ARCHIVOS.
+           OPEN INPUT  ARCHIVO-TRANSACCIONES
+           IF NOT WS-TRANS-OK
+               DISPLAY 'ERROR AL ABRIR ARCHIVO TRANSACCIONES: '
+                       WS-STATUS-TRANS
+               STOP RUN
+           END-IF
+
+           OPEN OUTPUT ARCHIVO-REPORTE
+           IF NOT WS-REPORTE-OK
+               DISPLAY 'ERROR AL ABRIR ARCHIVO REPORTE: '
+                       WS-STATUS-REPORTE
+               STOP RUN
+           END-IF.
+      *
+       LEER-TRANSACCION.
+           READ ARCHIVO-TRANSACCIONES INTO WS-TRANSACCION
+               AT END MOVE 'S' TO WS-FIN-ARCHIVO
+               NOT AT END ADD 1 TO WS-CONT-LEIDOS
+           END-READ.
+      *
+       CERRAR-ARCHIVOS.
+           CLOSE ARCHIVO-TRANSACCIONES
+           CLOSE ARCHIVO-REPORTE.
+      *
+      * RUTINAS DE PROCESO DE PRESTAMO
+      *
+       PROCESAR-PRESTAMO.
+           PERFORM VALIDAR-USUARIO
+           IF WS-RESULTADO-OK
+               PERFORM VALIDAR-LIBRO
+           END-IF
+           IF WS-RESULTADO-OK
+               PERFORM VALIDAR-TOPE-USUARIO
+           END-IF
+           IF WS-RESULTADO-OK
+               PERFORM CALCULAR-FECHAS-PRESTAMO
+           END-IF
+           IF WS-RESULTADO-OK
+               PERFORM REGISTRAR-PRESTAMO-DB2
+           END-IF
+           IF WS-RESULTADO-OK
+               ADD 1 TO WS-CONT-PRESTAMOS
+               PERFORM ESCRIBIR-DETALLE-REPORTE
+           END-IF.
+      *
+      * RUTINAS DE PROCESO DE DEVOLUCION
+      *
+       PROCESAR-DEVOLUCION.
+           PERFORM VALIDAR-USUARIO
+           IF WS-RESULTADO-OK
+               PERFORM BUSCAR-PRESTAMO-PENDIENTE
+           END-IF
+           IF WS-RESULTADO-OK
+               PERFORM CALCULAR-MULTA
+           END-IF
+           IF WS-RESULTADO-OK
+               PERFORM REGISTRAR-DEVOLUCION-DB2
+           END-IF
+           IF WS-RESULTADO-OK
+               ADD 1 TO WS-CONT-DEVOLUCIONES
+               PERFORM ESCRIBIR-DETALLE-REPORTE
+           END-IF.
+      *
+      * VALIDACIONES DE NEGOCIO
+      *
+       VALIDAR-USUARIO.
+      *    TODO: EXEC SQL SELECT PARA VERIFICAR QUE USUARIO EXISTE
+      *          Y ESTA ACTIVO
+           IF WS-TRANS-COD-USUARIO = SPACES
+               MOVE 'N' TO WS-RESULTADO
+               DISPLAY 'ERROR: CODIGO USUARIO VACIO'
+           END-IF.
+      *
+       VALIDAR-LIBRO.
+      *    TODO: EXEC SQL SELECT PARA VERIFICAR STOCK DISPONIBLE
+      *          DEL LIBRO Y QUE ESTE ACTIVO
+           IF WS-TRANS-COD-LIBRO = SPACES
+               MOVE 'N' TO WS-RESULTADO
+               DISPLAY 'ERROR: CODIGO LIBRO VACIO'
+           END-IF.
+      *
+       VALIDAR-TOPE-USUARIO.
+      *    Reglas de negocio (CONSTANT.CBL):
+      *    - ESTUDIANTE (E): max 3 libros
+      *    - DOCENTE (D): max 10 libros
+      *    - ADMINISTRATIVO (A): max 5 libros
+      *    TODO: EXEC SQL SELECT COUNT PARA VERIFICAR TOPE
+           DISPLAY 'VALIDANDO TOPE DE PRESTAMOS'.
+      *
+       CALCULAR-FECHAS-PRESTAMO.
+      *    Reglas (CONSTANT.CBL):
+      *    - ESTUDIANTE: 15 dias
+      *    - DOCENTE: 30 dias
+      *    - ADMINISTRATIVO: 20 dias
+      *    TODO: USAR WS-FECHA-PROCESO Y SUMAR DIAS SEGUN TIPO
+           DISPLAY 'CALCULANDO FECHA LIMITE'.
+      *
+       BUSCAR-PRESTAMO-PENDIENTE.
+      *    TODO: EXEC SQL SELECT PARA ENCONTRAR PRESTAMO PENDIENTE
+      *          DEL USUARIO Y LIBRO
+           DISPLAY 'BUSCANDO PRESTAMO PENDIENTE'.
+      *
+       CALCULAR-MULTA.
+      *    Si la devolucion supera la fecha limite:
+      *    dias_atraso * CONST-MULTA-DIA
+      *    TODO: Calcular diferencia de dias
+           DISPLAY 'CALCULANDO MULTA SI CORRESPONDE'.
+      *
+      * OPERACIONES DB2
+      *
+       REGISTRAR-PRESTAMO-DB2.
+      *    TODO: EXEC SQL INSERT INTO PRESTAMOS ...
+      *    TODO: EXEC SQL UPDATE LIBROS SET STOCK_DISPONIBLE = ...
+           DISPLAY 'SIMULANDO INSERT PRESTAMO DB2 PARA: '
+                   WS-TRANS-COD-USUARIO
+                   ' LIBRO: ' WS-TRANS-COD-LIBRO.
+      *
+       REGISTRAR-DEVOLUCION-DB2.
+      *    TODO: EXEC SQL UPDATE PRESTAMOS SET ESTADO = 'D' ...
+      *    TODO: EXEC SQL UPDATE LIBROS SET STOCK_DISPONIBLE = ...
+           DISPLAY 'SIMULANDO UPDATE DEVOLUCION DB2 PARA: '
+                   WS-TRANS-COD-USUARIO
+                   ' LIBRO: ' WS-TRANS-COD-LIBRO.
+      *
+      * RUTINAS DE REPORTE
+      *
+       ESCRIBIR-CABECERA-REPORTE.
+           IF WS-CONTADOR-LINEAS > 55
+               PERFORM SALTO-PAGINA
+           END-IF.
+      *
+       SALTO-PAGINA.
+           WRITE REG-REPORTE FROM LINEA-CABECERA-1 AFTER ADVANCING PAGE
+           WRITE REG-REPORTE FROM LINEA-CABECERA-2
+                 AFTER ADVANCING 1 LINE
+           MOVE WS-FECHA-PROCESO TO LIN-FECHA
+           MOVE 'REPORTE DE PRESTAMOS Y DEVOLUCIONES'
+                 TO LIN-TITULO-REPORTE
+           MOVE WS-NUMERO-PAGINA TO LIN-NUMERO-PAGINA
+           WRITE REG-REPORTE FROM LINEA-CABECERA-3
+                 AFTER ADVANCING 2 LINES
+           WRITE REG-REPORTE FROM LINEA-SEPARADOR
+                 AFTER ADVANCING 1 LINE
+           MOVE 1 TO WS-CONTADOR-LINEAS
+           ADD 1 TO WS-NUMERO-PAGINA.
+      *
+       ESCRIBIR-DETALLE-REPORTE.
+           IF WS-CONTADOR-LINEAS > 55
+               PERFORM SALTO-PAGINA
+           END-IF
+           DISPLAY 'TRANSACCION PROCESADA OK - TIPO: '
+                   WS-TRANS-TIPO
+                   ' USUARIO: ' WS-TRANS-COD-USUARIO
+                   ' LIBRO: ' WS-TRANS-COD-LIBRO
+           ADD 1 TO WS-CONTADOR-LINEAS.
+      *
+       ESCRIBIR-TOTALES.
+           WRITE REG-REPORTE FROM LINEA-SEPARADOR
+                 AFTER ADVANCING 3 LINES
+           DISPLAY '--- RESUMEN FINAL ---'
+           DISPLAY 'PRESTAMOS OK: ' WS-CONT-PRESTAMOS
+           DISPLAY 'DEVOLUCIONES OK: ' WS-CONT-DEVOLUCIONES
+           DISPLAY 'ERRORES: ' WS-CONT-ERRORES.
+      *
+      * RUTINAS DE UTILIDAD
+      *
+       OBTENER-FECHA-PROCESO.
+           ACCEPT WS-FECHA-PROCESO FROM DATE YYYYMMDD
+           INSPECT WS-FECHA-PROCESO REPLACING ALL '/' BY '-'.
