@@ -1,0 +1,16 @@
+CODIGO,TITULO,AUTOR,EDITORIAL,ANIO,CATEGORIA,STOCK,UBICACION
+LIB001,Programacion COBOL Moderna,Juan Perez,Editorial UNLAM,2025,Programacion,5,A-101
+LIB002,Base de Datos DB2 Fundamentos,Maria Gomez,IBM Press,2024,Base de Datos,3,B-202
+LIB003,Sistemas Operativos Mainframe,Carlos Ruiz,Editorial UNLAM,2025,Sistemas,4,C-303
+LIB004,Introduccion a CICS,Ana Lopez,IBM Press,2023,Programacion,2,A-102
+LIB005,Matematicas Discretas,Pedro Sanchez,Editorial UNLAM,2025,Matematicas,8,D-404
+LIB006,Redes de Computadoras,Laura Diaz,Prentice Hall,2024,Redes,6,E-505
+LIB007,Ingenieria de Software Moderna,Roberto Torres,Editorial UNLAM,2025,Programacion,4,A-103
+LIB008,Arquitectura de Computadoras,Silvia Morales,McGraw Hill,2023,Hardware,3,F-606
+LIB009,Inteligencia Artificial Aplicada,Diego Castro,Editorial UNLAM,2026,IA,5,G-707
+LIB010,Seguridad Informatica Avanzada,Monica Vega,IBM Press,2024,Seguridad,4,H-808
+LIB011,Analisis Numerico,Raul Fernandez,Editorial UNLAM,2025,Matematicas,3,D-405
+LIB012,Gestion de Proyectos TI,Patricia Ramos,Prentice Hall,2024,Gestion,6,I-909
+LIB013,Compiladores y Lenguajes,Gabriel Ortiz,Editorial UNLAM,2025,Programacion,2,A-104
+LIB014,Estructura de Datos Avanzada,Adriana Mendez,McGraw Hill,2023,Programacion,5,A-105
+LIB015,Cloud Computing Empresarial,Hector Luna,IBM Press,2026,Cloud,4,J-010

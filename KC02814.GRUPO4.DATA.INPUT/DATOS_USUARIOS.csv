@@ -1,0 +1,8 @@
+TIPO,CODIGO,NOMBRE,APELLIDO,TIPO_USUARIO,EMAIL,TELEFONO,DIRECCION
+A,U001,Juan,Perez,E,juan.perez@unlam.edu.ar,1122334455,Av Rivadavia 123
+A,U002,Maria,Gomez,D,maria.gomez@unlam.edu.ar,1155667788,Belgrano 456
+A,U003,Carlos,Ruiz,A,carlos.ruiz@unlam.edu.ar,1199887766,Corrientes 789
+A,U004,Ana,Lopez,E,ana.lopez@unlam.edu.ar,1144556677,Callao 321
+A,U005,Pedro,Sanchez,D,pedro.sanchez@unlam.edu.ar,1166332255,Santa Fe 654
+M,U003,Carlos,Ruiz,A,carlos.ruiz@unlam.edu.ar,1199887700,Corrientes 789
+B,U002,Maria,Gomez,D,maria.gomez@unlam.edu.ar,1155667788,Belgrano 456
