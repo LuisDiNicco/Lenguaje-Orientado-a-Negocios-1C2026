@@ -7,6 +7,11 @@
       * PROGRAMA: PRESTAM - PROCESAMIENTO DE PRESTAMOS Y DEVOLUCIONES *
       * DESCRIPCION: PROCESA TRANSACCIONES DE PRESTAMO/DEVOLUCION     *
       *              VALIDA REGLAS DE NEGOCIO Y ACTUALIZA DB2          *
+      * FORMATO ENTRADA: Registros de ancho fijo con separadores de   *
+      *                  1 byte entre campos.                          *
+      *                  TIPO(P/D)|USUARIO(10)|LIBRO(10)|FECHA(10)    *
+      * TODO: Adaptar a formato CSV si el archivo de entrada usa      *
+      *       comas como delimitador (UNSTRING DELIMITED BY ',').     *
       *****************************************************************
 
        ENVIRONMENT DIVISION.

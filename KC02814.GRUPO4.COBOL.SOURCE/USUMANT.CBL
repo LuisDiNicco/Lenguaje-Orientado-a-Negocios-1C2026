@@ -6,6 +6,11 @@
       * PROGRAMA: USUMANT - MANTENIMIENTO DE USUARIOS                 *
       * DESCRIPCION: PROCESA ARCHIVO DE NOVEDADES (ALTA/BAJA/MOD)     *
       *              Y ACTUALIZA LA BASE DB2                           *
+      * FORMATO ENTRADA: Registros de ancho fijo con separadores de   *
+      *                  1 byte entre campos.                          *
+      *                  TIPO(A/B/M)|CODIGO(10)|NOMBRE(30)|...        *
+      * TODO: Adaptar a formato CSV si el archivo de entrada usa      *
+      *       comas como delimitador (UNSTRING DELIMITED BY ',').     *
       *****************************************************************
 
        ENVIRONMENT DIVISION.
