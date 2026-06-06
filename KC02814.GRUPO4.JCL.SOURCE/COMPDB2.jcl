@@ -1,0 +1,50 @@
+//COMPDB2 JOB 1,NOTIFY=&SYSUID,MSGLEVEL=(1,1),MSGCLASS=H
+//****************************************************************
+//* JCL: COMPDB2 - COMPILACION COBOL CON SQL EMBEBIDO (DB2)      *
+//* DESCRIPCION: PRECOMPILA, COMPILA, LINKEA PROGRAMA COBOL+DB2  *
+//* USO: REEMPLAZAR <PROGRAMA> POR EL NOMBRE DEL PROGRAMA        *
+//****************************************************************
+//*
+//* ---------------------------------------------------------------
+//* PASO 1: PRECOMPILACION DB2 (TRADUCE EXEC SQL A CALLS)
+//* ---------------------------------------------------------------
+//PC       EXEC PGM=DSNHPC,
+//         PARM='HOST(COB2)'
+//*
+//DBRMLIB  DD DSN=&SYSUID..DB2.DBRMLIB(<PROGRAMA>),DISP=SHR
+//STEPLIB  DD DSN=DSND10.SDSNLOAD,DISP=SHR
+//         DD DSN=DSND10.DBDG.SDSNEXIT,DISP=SHR
+//SYSPRINT DD SYSOUT=*
+//SYSTERM  DD SYSOUT=*
+//SYSUDUMP DD SYSOUT=*
+//SYSUT1   DD UNIT=SYSDA,SPACE=(800,(500,500))
+//SYSUT2   DD UNIT=SYSDA,SPACE=(800,(500,500))
+//SYSIN    DD DSN=&SYSUID..COBOL.SOURCE(<PROGRAMA>),DISP=SHR
+//SYSCIN   DD DSN=&SYSUID..DB2.SYSCIN(<PROGRAMA>),DISP=SHR
+//*
+//* INCLUIR SQLCA Y COPYBOOKS DB2
+//*
+//SYSLIB   DD DSN=&SYSUID..COBOL.COPYLIB,DISP=SHR
+//         DD DSN=DSND10.SDSNSAMP,DISP=SHR
+//*
+//* ---------------------------------------------------------------
+//* PASO 2: COMPILACION COBOL (CODIGO PRECOMPILADO)
+//* ---------------------------------------------------------------
+//COB      EXEC PGM=IGYCRCTL,COND=(4,LT,PC)
+//STEPLIB  DD DSN=IGY.SIGYCOMP,DISP=SHR
+//SYSPRINT DD SYSOUT=*
+//SYSTERM  DD SYSOUT=*
+//SYSIN    DD DSN=&SYSUID..DB2.SYSCIN(<PROGRAMA>),DISP=SHR
+//SYSLIB   DD DSN=&SYSUID..COBOL.COPYLIB,DISP=SHR
+//SYSLIN   DD DSN=&SYSUID..DB2.OBJ(<PROGRAMA>),DISP=SHR
+//*
+//* ---------------------------------------------------------------
+//* PASO 3: LINKEADO (GENERA EL EJECUTABLE)
+//* ---------------------------------------------------------------
+//LKED     EXEC PGM=IEWL,COND=(4,LT,COB)
+//SYSPRINT DD SYSOUT=*
+//SYSLMOD  DD DSN=&SYSUID..LOAD.LIBRARY(<PROGRAMA>),DISP=SHR
+//SYSLIB   DD DSN=DSND10.SDSNLOAD,DISP=SHR
+//SYSUT1   DD UNIT=SYSDA,SPACE=(CYL,(1,1))
+//SYSLIN   DD DSN=&SYSUID..DB2.OBJ(<PROGRAMA>),DISP=SHR
+//*
