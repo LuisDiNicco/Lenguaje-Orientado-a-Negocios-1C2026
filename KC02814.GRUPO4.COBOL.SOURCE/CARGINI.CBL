@@ -208,11 +208,11 @@
             IF WS-ENT-ANIO NOT NUMERIC
                 MOVE 'N' TO WS-RESULTADO
             END-IF
-       *    TODO: Validar que WS-ENT-ANIO este entre 1900 y 2100
 
             IF WS-ENT-STOCK NOT NUMERIC
                 MOVE 'N' TO WS-RESULTADO
-            END-IF.
+            END-IF
+       *    TODO: Validar que WS-ENT-ANIO este entre 1900 y 2100
        *    TODO: Validar que WS-ENT-STOCK > 0
        *
         PROCESAR-REGISTRO.
