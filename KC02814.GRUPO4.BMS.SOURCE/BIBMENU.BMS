@@ -22,13 +22,16 @@ MENU    DFHMDI SIZE=(24,80),LINE=1,COLUMN=1
          DFHMDF POS=(10,15),LENGTH=30,                                 X
                ATTRB=(NORM,PROT),                                      X
                INITIAL='4. REPORTES'
-         DFHMDF POS=(12,15),LENGTH=15,                                 X
+         DFHMDF POS=(11,15),LENGTH=30,                                 X
                ATTRB=(NORM,PROT),                                      X
-               INITIAL='OPCION (1-4):'
-OPCION   DFHMDF POS=(12,31),LENGTH=1,                                  X
+               INITIAL='X. SALIR'
+         DFHMDF POS=(13,15),LENGTH=20,                                 X
+               ATTRB=(NORM,PROT),                                      X
+               INITIAL='OPCION (1-4,X):'
+OPCION   DFHMDF POS=(13,37),LENGTH=1,                                  X
                ATTRB=(NORM,UNPROT,IC,FSET),                            X
                INITIAL=' '
-         DFHMDF POS=(12,33),LENGTH=1,ATTRB=(ASKIP,DRK)
+         DFHMDF POS=(13,39),LENGTH=1,ATTRB=(ASKIP,DRK)
 
 * --- AREA DE MENSAJES DE ERROR O INFO
 MENSAJE1 DFHMDF POS=(22,1),LENGTH=60,ATTRB=(BRT,PROT),INITIAL=' '

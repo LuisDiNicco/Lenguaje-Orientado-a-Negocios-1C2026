@@ -79,20 +79,18 @@
 
            EVALUATE WS-OPCION
                WHEN '1'
-      *             TODO: Implementar desvio a BIBCONS
-      *             EXEC CICS XCTL PROGRAM('BIBCONS') END-EXEC
-                    MOVE 'MODULO CONSULTAS EN DESARROLLO' TO WS-MENSAJE
+                    EXEC CICS XCTL PROGRAM('BIBCONS') END-EXEC
                WHEN '2'
-      *             TODO: Implementar desvio a USUARIOS
-                    MOVE 'MODULO USUARIOS ES BATCH' TO WS-MENSAJE
+                    MOVE 'MODULO USUARIOS ES BATCH (USUMANT)' TO WS-MENSAJE
                WHEN '3'
-      *             TODO: Implementar desvio a BIBPRES
-                    MOVE 'MODULO PRESTAMOS EN DESARROLLO' TO WS-MENSAJE
+                    EXEC CICS XCTL PROGRAM('BIBPRES') END-EXEC
                WHEN '4'
-      *             TODO: Implementar desvio a REPORTES
-                    MOVE 'MODULO REPORTES ES BATCH' TO WS-MENSAJE
+                    MOVE 'MODULO REPORTES ES BATCH (REPORTES)' TO WS-MENSAJE
+               WHEN 'X'
+               WHEN 'x'
+                    PERFORM TERMINAR-TRANSACCION
                WHEN OTHER
-                    MOVE 'OPCION INVALIDA (1-4)' TO WS-MENSAJE
+                    MOVE 'OPCION INVALIDA (1-4,X)' TO WS-MENSAJE
            END-EVALUATE
 
            PERFORM ENVIAR-MAPA-CON-DATOS.

@@ -4,26 +4,57 @@ CONS    DFHMDI SIZE=(24,80),LINE=1,COLUMN=1
          DFHMDF POS=(01,25),LENGTH=30,                                 X
                ATTRB=(BRT,PROT),                                       X
                INITIAL='*** CONSULTA DE LIBROS ***'
-         DFHMDF POS=(03,02),LENGTH=76,                                 X
+
+* --- CAMPOS DE BUSQUEDA (codigo, titulo, autor, categoria)
+         DFHMDF POS=(03,02),LENGTH=15,                                 X
+               ATTRB=(NORM,PROT),                                      X
+               INITIAL='CODIGO:'
+CODIGO   DFHMDF POS=(03,18),LENGTH=10,                                 X
+               ATTRB=(NORM,UNPROT,IC,FSET),                            X
+               INITIAL='          '
+         DFHMDF POS=(03,30),LENGTH=3,ATTRB=(ASKIP,DRK)
+         DFHMDF POS=(04,02),LENGTH=15,                                 X
+               ATTRB=(NORM,PROT),                                      X
+               INITIAL='TITULO:'
+TITULO   DFHMDF POS=(04,18),LENGTH=30,                                 X
+               ATTRB=(NORM,UNPROT,IC,FSET),                            X
+               INITIAL='                              '
+         DFHMDF POS=(04,50),LENGTH=3,ATTRB=(ASKIP,DRK)
+         DFHMDF POS=(05,02),LENGTH=15,                                 X
+               ATTRB=(NORM,PROT),                                      X
+               INITIAL='AUTOR:'
+AUTOR    DFHMDF POS=(05,18),LENGTH=20,                                 X
+               ATTRB=(NORM,UNPROT,IC,FSET),                            X
+               INITIAL='                    '
+         DFHMDF POS=(05,40),LENGTH=3,ATTRB=(ASKIP,DRK)
+         DFHMDF POS=(06,02),LENGTH=15,                                 X
+               ATTRB=(NORM,PROT),                                      X
+               INITIAL='CATEGORIA:'
+CATEG    DFHMDF POS=(06,18),LENGTH=20,                                 X
+               ATTRB=(NORM,UNPROT,IC,FSET),                            X
+               INITIAL='                    '
+         DFHMDF POS=(06,40),LENGTH=3,ATTRB=(ASKIP,DRK)
+
+* --- CABECERA RESULTADOS
+         DFHMDF POS=(08,02),LENGTH=76,                                 X
                ATTRB=(NORM,PROT),                                      X
                INITIAL='CODIGO      TITULO               AUTOR          X
                ANIO STK UBIC'
 
-* --- AREA DE LISTADO DE LIBROS (10 lineas)
-MENSAJE1 DFHMDF POS=(05,1),LENGTH=78,ATTRB=(NORM,PROT),INITIAL=' '
-MENSAJE2 DFHMDF POS=(06,1),LENGTH=78,ATTRB=(NORM,PROT),INITIAL=' '
-MENSAJE3 DFHMDF POS=(07,1),LENGTH=78,ATTRB=(NORM,PROT),INITIAL=' '
-MENSAJE4 DFHMDF POS=(08,1),LENGTH=78,ATTRB=(NORM,PROT),INITIAL=' '
-MENSAJE5 DFHMDF POS=(09,1),LENGTH=78,ATTRB=(NORM,PROT),INITIAL=' '
-MENSAJE6 DFHMDF POS=(10,1),LENGTH=78,ATTRB=(NORM,PROT),INITIAL=' '
-MENSAJE7 DFHMDF POS=(11,1),LENGTH=78,ATTRB=(NORM,PROT),INITIAL=' '
-MENSAJE8 DFHMDF POS=(12,1),LENGTH=78,ATTRB=(NORM,PROT),INITIAL=' '
-MENSAJE9 DFHMDF POS=(13,1),LENGTH=78,ATTRB=(NORM,PROT),INITIAL=' '
-MENSAJE10 DFHMDF POS=(14,1),LENGTH=78,ATTRB=(NORM,PROT),INITIAL=' '
+* --- AREA DE LISTADO DE LIBROS (10 lineas, paginado)
+MENSAJE1 DFHMDF POS=(09,1),LENGTH=78,ATTRB=(NORM,PROT),INITIAL=' '
+MENSAJE2 DFHMDF POS=(10,1),LENGTH=78,ATTRB=(NORM,PROT),INITIAL=' '
+MENSAJE3 DFHMDF POS=(11,1),LENGTH=78,ATTRB=(NORM,PROT),INITIAL=' '
+MENSAJE4 DFHMDF POS=(12,1),LENGTH=78,ATTRB=(NORM,PROT),INITIAL=' '
+MENSAJE5 DFHMDF POS=(13,1),LENGTH=78,ATTRB=(NORM,PROT),INITIAL=' '
+MENSAJE6 DFHMDF POS=(14,1),LENGTH=78,ATTRB=(NORM,PROT),INITIAL=' '
+MENSAJE7 DFHMDF POS=(15,1),LENGTH=78,ATTRB=(NORM,PROT),INITIAL=' '
+MENSAJE8 DFHMDF POS=(16,1),LENGTH=78,ATTRB=(NORM,PROT),INITIAL=' '
+MENSAJE9 DFHMDF POS=(17,1),LENGTH=78,ATTRB=(NORM,PROT),INITIAL=' '
+MENSAJE10 DFHMDF POS=(18,1),LENGTH=78,ATTRB=(NORM,PROT),INITIAL=' '
 
-         DFHMDF POS=(22,10),LENGTH=50,                                 X
-               ATTRB=(BRT,PROT),                                       X
-               INITIAL='TODO: AGREGAR CAMPOS DE BUSQUEDA AQUI'
+* --- MENSAJE DE ESTADO
+MSGSTAT  DFHMDF POS=(22,1),LENGTH=60,ATTRB=(BRT,PROT),INITIAL=' '
 
          DFHMDF POS=(24,10),LENGTH=50,                                 X
                ATTRB=(NORM,PROT),                                      X

@@ -100,7 +100,26 @@
        01  WS-NUMERO-PAGINA           PIC 9(3) VALUE 1.
        01  WS-CONTADOR-LINEAS         PIC 9(2) VALUE 99.
 
-      * TODO: AGREGAR DECLARACIONES DE DB2 (EXEC SQL INCLUDE SQLCA) AQUI
+      *
+      * DECLARACIONES DB2
+      *
+           EXEC SQL INCLUDE SQLCA END-EXEC.
+      *
+      * VARIABLES HOST PARA DB2
+      *
+       01  DCL-LIBROS.
+           05 DCL-LIB-CODIGO            PIC X(10).
+           05 DCL-LIB-TITULO            PIC X(60).
+           05 DCL-LIB-AUTOR             PIC X(40).
+           05 DCL-LIB-EDITORIAL         PIC X(30).
+           05 DCL-LIB-ANIO-PUBLICACION  PIC 9(4).
+           05 DCL-LIB-CATEGORIA         PIC X(20).
+           05 DCL-LIB-STOCK-TOTAL       PIC 9(3).
+           05 DCL-LIB-STOCK-DISPONIBLE  PIC 9(3).
+           05 DCL-LIB-UBICACION         PIC X(10).
+           05 DCL-LIB-FECHA-ALTA        PIC X(10).
+           05 DCL-LIB-USUARIO-ALTA      PIC X(8).
+           05 DCL-LIB-ESTADO            PIC X(1).
 
        PROCEDURE DIVISION.
       *
@@ -212,10 +231,57 @@
            MOVE 'GRUPO 4'              TO LIB-USUARIO-ALTA
            MOVE 'A'                    TO LIB-ESTADO.
       *
-       GUARDAR-EN-DB2.
-      *    TODO: Reemplazar este bloque por un EXEC SQL INSERT
-      *    cuando aprendan DB2 en clase. Por ahora solo mostramos.
-           DISPLAY 'SIMULANDO INSERT EN DB2 PARA: ' LIB-CODIGO.
+        GUARDAR-EN-DB2.
+      *    INSERT EN DB2 - TABLA LIBROS
+           MOVE LIB-CODIGO              TO DCL-LIB-CODIGO
+           MOVE LIB-TITULO              TO DCL-LIB-TITULO
+           MOVE LIB-AUTOR               TO DCL-LIB-AUTOR
+           MOVE LIB-EDITORIAL           TO DCL-LIB-EDITORIAL
+           MOVE LIB-ANIO-PUBLICACION    TO DCL-LIB-ANIO-PUBLICACION
+           MOVE LIB-CATEGORIA           TO DCL-LIB-CATEGORIA
+           MOVE LIB-STOCK-TOTAL         TO DCL-LIB-STOCK-TOTAL
+           MOVE LIB-STOCK-DISPONIBLE    TO DCL-LIB-STOCK-DISPONIBLE
+           MOVE LIB-UBICACION           TO DCL-LIB-UBICACION
+           MOVE LIB-FECHA-ALTA          TO DCL-LIB-FECHA-ALTA
+           MOVE LIB-USUARIO-ALTA        TO DCL-LIB-USUARIO-ALTA
+           MOVE LIB-ESTADO              TO DCL-LIB-ESTADO
+
+           EXEC SQL
+               INSERT INTO KC02814.LIBROS
+                   (LIB_CODIGO,
+                    LIB_TITULO,
+                    LIB_AUTOR,
+                    LIB_EDITORIAL,
+                    LIB_ANIO_PUBLICACION,
+                    LIB_CATEGORIA,
+                    LIB_STOCK_TOTAL,
+                    LIB_STOCK_DISPONIBLE,
+                    LIB_UBICACION,
+                    LIB_FECHA_ALTA,
+                    LIB_USUARIO_ALTA,
+                    LIB_ESTADO)
+               VALUES
+                   (:DCL-LIB-CODIGO,
+                    :DCL-LIB-TITULO,
+                    :DCL-LIB-AUTOR,
+                    :DCL-LIB-EDITORIAL,
+                    :DCL-LIB-ANIO-PUBLICACION,
+                    :DCL-LIB-CATEGORIA,
+                    :DCL-LIB-STOCK-TOTAL,
+                    :DCL-LIB-STOCK-DISPONIBLE,
+                    :DCL-LIB-UBICACION,
+                    :DCL-LIB-FECHA-ALTA,
+                    :DCL-LIB-USUARIO-ALTA,
+                    :DCL-LIB-ESTADO)
+           END-EXEC.
+
+           IF SQLCODE = 0
+               DISPLAY 'INSERT DB2 OK: ' LIB-CODIGO
+           ELSE
+               DISPLAY 'ERROR DB2 SQLCODE: ' SQLCODE
+                       ' PARA LIBRO: ' LIB-CODIGO
+               MOVE 'N' TO WS-RESULTADO
+           END-IF.
       *
       * RUTINAS DE REPORTE
       *
