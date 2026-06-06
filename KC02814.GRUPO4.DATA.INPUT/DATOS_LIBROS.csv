@@ -14,3 +14,38 @@ LIB012,Gestion de Proyectos TI,Patricia Ramos,Prentice Hall,2024,Gestion,6,I-909
 LIB013,Compiladores y Lenguajes,Gabriel Ortiz,Editorial UNLAM,2025,Programacion,2,A-104
 LIB014,Estructura de Datos Avanzada,Adriana Mendez,McGraw Hill,2023,Programacion,5,A-105
 LIB015,Cloud Computing Empresarial,Hector Luna,IBM Press,2026,Cloud,4,J-010
+LIB016,Algoritmos y Complejidad Computacional,Martin Sosa,McGraw Hill,2024,Programacion,3,A-106
+LIB017,Fundamentos de Robotica,Carolina Vega,Editorial UNLAM,2025,Robotica,4,K-111
+LIB018,Estadistica Aplicada a Ingenieria,Ricardo Palma,Prentice Hall,2023,Matematicas,7,D-406
+LIB019,Microprocesadores y Circuitos,Esteban Quiroga,McGraw Hill,2022,Hardware,5,F-607
+LIB020,Ciberseguridad en Entornos Corporativos,Natalia Rios,IBM Press,2025,Seguridad,6,H-809
+LIB021,Teoria de la Computacion,Jorge Castillo,Editorial UNLAM,2024,Programacion,3,A-107
+LIB022,Calculo Vectorial y Tensorial,Andrea Farias,Editorial UNLAM,2025,Matematicas,5,D-407
+LIB023,Desarrollo Web Full Stack,Facundo Mendez,Prentice Hall,2026,Programacion,4,A-108
+LIB024,Big Data y Analitica Predictiva,Valentina Herrera,IBM Press,2025,Datos,3,L-012
+LIB025,Metodologias Agiles en la Practica,Luciano Silva,Editorial UNLAM,2024,Gestion,5,I-910
+LIB026,Sistemas Embebidos y RTOS,Romina Paez,McGraw Hill,2023,Sistemas,2,C-304
+LIB027,Fisica para Ciencias de la Computacion,Daniel Muñoz,Editorial UNLAM,2024,Fisica,6,M-013
+LIB028,Auditoria de Sistemas Informaticos,Florencia Rossi,IBM Press,2025,Seguridad,4,H-810
+LIB029,Algebra Lineal con Aplicaciones,Paola Bianchi,Editorial UNLAM,2024,Matematicas,8,D-408
+LIB030,Deep Learning y Redes Neuronales,Matias Correa,IBM Press,2026,IA,5,G-708
+LIB031,Sistemas Operativos Distribuidos,Gustavo Iglesias,Prentice Hall,2023,Sistemas,3,C-305
+LIB032,Bases de Datos NoSQL y Grafos,Sofia Delgado,Editorial UNLAM,2025,Base de Datos,4,B-203
+LIB033,Programacion Paralela y Concurrente,Emiliano Rojas,McGraw Hill,2024,Programacion,3,A-109
+LIB034,Internet de las Cosas Aplicado,Brenda Nuñez,IBM Press,2026,IoT,5,N-014
+LIB035,Analisis y Diseño de Algoritmos,Leandro Ferreyra,Editorial UNLAM,2023,Programacion,4,A-110
+LIB036,Etica Profesional en Informatica,Julieta Cardozo,Editorial UNLAM,2024,Etica,7,O-015
+LIB037,Administracion de Redes Empresariales,Federico Acosta,Prentice Hall,2025,Redes,4,E-506
+LIB038,Mineria de Datos y Descubrimiento,Camila Toledo,IBM Press,2026,Datos,3,L-013
+LIB039,Teoria de Grafos y Optimizacion,Sebastian Ledesma,Editorial UNLAM,2025,Matematicas,4,D-409
+LIB040,Realidad Virtual y Aumentada,Nicolas Ibañez,McGraw Hill,2026,Realidad Virtual,3,P-016
+LIB041,Ingenieria de Requisitos Avanzada,Agustina Ponce,Editorial UNLAM,2024,Gestion,5,I-911
+LIB042,Compiladores y Maquinas Virtuales,Ignacio Roldan,Prentice Hall,2023,Programacion,2,A-111
+LIB043,Bioinformatica y Computacion,Marina Luque,IBM Press,2025,Bioinformatica,4,Q-017
+LIB044,Gestion de la Configuracion,Andres Pereyra,Editorial UNLAM,2024,Gestion,3,I-912
+LIB045,Metodos Numericos Computacionales,Victoria Lamas,Editorial UNLAM,2025,Matematicas,5,D-410
+LIB046,Arquitectura de Microservicios,Cristian Paz,IBM Press,2026,Programacion,6,A-112
+LIB047,Seguridad en Aplicaciones Web,Daiana Acuña,Prentice Hall,2024,Seguridad,4,H-811
+LIB048,Aprendizaje Automatico Supervisado,Tomas Godoy,IBM Press,2026,IA,5,G-709
+LIB049,Cloud Native y Contenedores,Agustin Melo,Editorial UNLAM,2025,Cloud,3,J-011
+LIB050,Gobierno y Gestion de TI Empresarial,Lorena Bargas,Prentice Hall,2024,Gestion,4,I-913

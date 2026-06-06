@@ -1,8 +1,36 @@
 TIPO,CODIGO,NOMBRE,APELLIDO,TIPO_USUARIO,EMAIL,TELEFONO,DIRECCION
-A,U001,Juan,Perez,E,juan.perez@unlam.edu.ar,1122334455,Av Rivadavia 123
-A,U002,Maria,Gomez,D,maria.gomez@unlam.edu.ar,1155667788,Belgrano 456
-A,U003,Carlos,Ruiz,A,carlos.ruiz@unlam.edu.ar,1199887766,Corrientes 789
-A,U004,Ana,Lopez,E,ana.lopez@unlam.edu.ar,1144556677,Callao 321
-A,U005,Pedro,Sanchez,D,pedro.sanchez@unlam.edu.ar,1166332255,Santa Fe 654
-M,U003,Carlos,Ruiz,A,carlos.ruiz@unlam.edu.ar,1199887700,Corrientes 789
-B,U002,Maria,Gomez,D,maria.gomez@unlam.edu.ar,1155667788,Belgrano 456
+A,U001,Juan,Perez,E,juan.perez@unlam.edu.ar,1122334455,Av Rivadavia 1234 1A
+A,U002,Maria,Gomez,D,maria.gomez@unlam.edu.ar,1155667788,Belgrano 456 2B
+A,U003,Carlos,Ruiz,A,carlos.ruiz@unlam.edu.ar,1199887766,Corrientes 789 3C
+A,U004,Ana,Lopez,E,ana.lopez@unlam.edu.ar,1144556677,Callao 321 4D
+A,U005,Pedro,Sanchez,D,pedro.sanchez@unlam.edu.ar,1166332255,Santa Fe 654 5E
+A,U006,Laura,Diaz,E,laura.diaz@unlam.edu.ar,1133221144,Av de Mayo 111 6A
+A,U007,Roberto,Torres,E,roberto.torres@unlam.edu.ar,1155443322,San Juan 222 7B
+A,U008,Silvia,Morales,D,silvia.morales@unlam.edu.ar,1188776655,Entre Rios 333 8C
+A,U009,Diego,Castro,E,diego.castro@unlam.edu.ar,1122998877,Av Libertador 444 9D
+A,U010,Monica,Vega,A,monica.vega@unlam.edu.ar,1166885544,Las Heras 555 10E
+A,U011,Raul,Fernandez,E,raul.fernandez@unlam.edu.ar,1133669977,Cordoba 666 11A
+A,U012,Patricia,Ramos,D,patricia.ramos@unlam.edu.ar,1155778866,Paraguay 777 12B
+A,U013,Gabriel,Ortiz,E,gabriel.ortiz@unlam.edu.ar,1199223355,Uruguay 888 13C
+A,U014,Adriana,Mendez,A,adriana.mendez@unlam.edu.ar,1122884466,Chile 999 14D
+A,U015,Hector,Luna,E,hector.luna@unlam.edu.ar,1166228844,Peru 111 15E
+A,U016,Carolina,Vega,E,carolina.vega@unlam.edu.ar,1177441133,San Martin 222 16A
+A,U017,Ricardo,Palma,D,ricardo.palma@unlam.edu.ar,1133557799,Brown 333 17B
+A,U018,Esteban,Quiroga,E,esteban.quiroga@unlam.edu.ar,1155994488,Alvear 444 18C
+A,U019,Natalia,Rios,D,natalia.rios@unlam.edu.ar,1188332266,Guemes 555 19D
+A,U020,Jorge,Castillo,A,jorge.castillo@unlam.edu.ar,1122776644,Arenales 666 20E
+A,U021,Andrea,Farias,E,andrea.farias@unlam.edu.ar,1166442288,Cabildo 777 21A
+A,U022,Facundo,Mendez,D,facundo.mendez@unlam.edu.ar,1133885599,Tucuman 888 22B
+A,U023,Valentina,Herrera,E,valentina.herrera@unlam.edu.ar,1155223377,Salta 999 23C
+A,U024,Luciano,Silva,E,luciano.silva@unlam.edu.ar,1199661133,Jujuy 111 24D
+A,U025,Romina,Paez,D,romina.paez@unlam.edu.ar,1144332266,Mendoza 222 25E
+A,U026,Daniel,Muñoz,A,daniel.munoz@unlam.edu.ar,1177885599,San Luis 333 26A
+A,U027,Florencia,Rossi,E,florencia.rossi@unlam.edu.ar,1133997744,La Rioja 444 27B
+A,U028,Paola,Bianchi,D,paola.bianchi@unlam.edu.ar,1155446699,Catamarca 555 28C
+A,U029,Matias,Correa,E,matias.correa@unlam.edu.ar,1122558877,Santiago 666 29D
+A,U030,Gustavo,Iglesias,A,gustavo.iglesias@unlam.edu.ar,1188992244,Chaco 777 30E
+M,U003,Carlos,Ruiz,A,carlos.ruiz@unlam.edu.ar,1199887700,Corrientes 789 3C
+M,U007,Roberto,Torres,E,roberto.torres@unlam.edu.ar,1155443323,San Juan 234 7B
+M,U015,Hector,Luna,E,hector.luna@unlam.edu.ar,1166228811,Peru 222 15E
+B,U002,Maria,Gomez,D,maria.gomez@unlam.edu.ar,1155667788,Belgrano 456 2B
+B,U021,Andrea,Farias,E,andrea.farias@unlam.edu.ar,1166442288,Cabildo 777 21A
