@@ -26,10 +26,10 @@
        DATA DIVISION.
        FILE SECTION.
        FD  ARCHIVO-ENTRADA
-           RECORD CONTAINS 200 CHARACTERS
+           RECORD CONTAINS 500 CHARACTERS
            BLOCK CONTAINS 0 RECORDS
            DATA RECORD IS REG-ENTRADA.
-       01  REG-ENTRADA                PIC X(200).
+       01  REG-ENTRADA                PIC X(500).
 
        FD  ARCHIVO-REPORTE
            RECORDING MODE IS F
@@ -76,23 +76,26 @@
       *
       * AREAS DE TRABAJO
       *
-       01  WS-REGISTRO-ENTRADA.
-           05 WS-ENT-CODIGO           PIC X(10).
-           05 FILLER                  PIC X(1).
-           05 WS-ENT-TITULO           PIC X(60).
-           05 FILLER                  PIC X(1).
-           05 WS-ENT-AUTOR            PIC X(40).
-           05 FILLER                  PIC X(1).
-           05 WS-ENT-EDITORIAL        PIC X(30).
-           05 FILLER                  PIC X(1).
-           05 WS-ENT-ANIO             PIC X(4).
-           05 FILLER                  PIC X(1).
-           05 WS-ENT-CATEGORIA        PIC X(20).
-           05 FILLER                  PIC X(1).
-           05 WS-ENT-STOCK            PIC X(3).
-           05 FILLER                  PIC X(1).
-           05 WS-ENT-UBICACION        PIC X(10).
-           05 FILLER                  PIC X(16).
+      * LINEA CSV COMPLETA (500 bytes para admitir campos largos)
+      *
+       01  WS-CSV-LINE                PIC X(500).
+      *
+      * CAMPOS PARSEADOS DEL CSV (8 columnas delimitadas por coma)
+      *
+       01  WS-CSV-FIELDS.
+           05 WS-CSV-CODIGO           PIC X(10).
+           05 WS-CSV-TITULO           PIC X(60).
+           05 WS-CSV-AUTOR            PIC X(40).
+           05 WS-CSV-EDITORIAL        PIC X(30).
+           05 WS-CSV-ANIO             PIC X(4).
+           05 WS-CSV-CATEGORIA        PIC X(20).
+           05 WS-CSV-STOCK            PIC X(3).
+           05 WS-CSV-UBICACION        PIC X(10).
+      *
+      * FLAG PARA DETECTAR PRIMER REGISTRO (HEADER DEL CSV)
+      *
+       01  WS-PRIMER-REGISTRO         PIC X(1) VALUE 'S'.
+          88 WS-ES-HEADER             VALUE 'S'.
       *
       * LINEAS DE REPORTE
       *
@@ -179,10 +182,30 @@
            END-IF.
       *
        LEER-ENTRADA.
-           READ ARCHIVO-ENTRADA INTO WS-REGISTRO-ENTRADA
+           READ ARCHIVO-ENTRADA INTO WS-CSV-LINE
                AT END MOVE 'S' TO WS-FIN-ARCHIVO
-               NOT AT END ADD 1 TO WS-CONT-LEIDOS
+               NOT AT END
+                   IF WS-ES-HEADER
+                       MOVE 'N' TO WS-PRIMER-REGISTRO
+                   ELSE
+                       PERFORM PARSE-CSV
+                       ADD 1 TO WS-CONT-LEIDOS
+                   END-IF
            END-READ.
+      *
+       PARSE-CSV.
+      *    Divide la linea CSV en 8 campos delimitados por coma
+           MOVE SPACES TO WS-CSV-FIELDS
+           UNSTRING WS-CSV-LINE DELIMITED BY ','
+               INTO WS-CSV-CODIGO
+                    WS-CSV-TITULO
+                    WS-CSV-AUTOR
+                    WS-CSV-EDITORIAL
+                    WS-CSV-ANIO
+                    WS-CSV-CATEGORIA
+                    WS-CSV-STOCK
+                    WS-CSV-UBICACION
+           END-UNSTRING.
       *
        CERRAR-ARCHIVOS.
            CLOSE ARCHIVO-ENTRADA
@@ -193,53 +216,53 @@
         VALIDAR-REGISTRO.
             MOVE 'S' TO WS-RESULTADO
 
-            IF WS-ENT-CODIGO = SPACES
+            IF WS-CSV-CODIGO = SPACES
                 MOVE 'N' TO WS-RESULTADO
             END-IF
 
-            IF WS-ENT-TITULO = SPACES
+            IF WS-CSV-TITULO = SPACES
                 MOVE 'N' TO WS-RESULTADO
             END-IF
 
-            IF WS-ENT-AUTOR = SPACES
+            IF WS-CSV-AUTOR = SPACES
                 MOVE 'N' TO WS-RESULTADO
             END-IF
 
-            IF WS-ENT-ANIO NOT NUMERIC
+            IF WS-CSV-ANIO NOT NUMERIC
                 MOVE 'N' TO WS-RESULTADO
             END-IF
 
-            IF WS-ENT-STOCK NOT NUMERIC
+            IF WS-CSV-STOCK NOT NUMERIC
                 MOVE 'N' TO WS-RESULTADO
             END-IF
-       *    TODO: Validar que WS-ENT-ANIO este entre 1900 y 2100
-       *    TODO: Validar que WS-ENT-STOCK > 0
+       *    TODO: Validar que WS-CSV-ANIO este entre 1900 y 2100
+       *    TODO: Validar que WS-CSV-STOCK > 0
        *
         PROCESAR-REGISTRO.
        *    TODO: Validar codigo unico antes del INSERT:
        *          EXEC SQL SELECT LIB_CODIGO INTO :DCL-LIB-CODIGO
        *          FROM KC02814.LIBROS
-       *          WHERE LIB_CODIGO = :WS-ENT-CODIGO
+       *          WHERE LIB_CODIGO = :WS-CSV-CODIGO
        *          END-EXEC.
        *          IF SQLCODE = 0 THEN codigo ya existe, error.
             PERFORM MOVER-DATOS-MAESTRO
             PERFORM GUARDAR-EN-DB2
             PERFORM ESCRIBIR-DETALLE-REPORTE
             ADD 1 TO WS-CONT-PROCESADOS.
-      *
-       MOVER-DATOS-MAESTRO.
-           MOVE WS-ENT-CODIGO          TO LIB-CODIGO
-           MOVE WS-ENT-TITULO          TO LIB-TITULO
-           MOVE WS-ENT-AUTOR           TO LIB-AUTOR
-           MOVE WS-ENT-EDITORIAL       TO LIB-EDITORIAL
-           MOVE WS-ENT-ANIO            TO LIB-ANIO-PUBLICACION
-           MOVE WS-ENT-CATEGORIA       TO LIB-CATEGORIA
-           MOVE WS-ENT-STOCK           TO LIB-STOCK-TOTAL
-           MOVE WS-ENT-STOCK           TO LIB-STOCK-DISPONIBLE
-           MOVE WS-ENT-UBICACION       TO LIB-UBICACION
-           MOVE WS-FECHA-PROCESO       TO LIB-FECHA-ALTA
-           MOVE 'GRUPO 4'              TO LIB-USUARIO-ALTA
-           MOVE 'A'                    TO LIB-ESTADO.
+       *
+        MOVER-DATOS-MAESTRO.
+            MOVE WS-CSV-CODIGO          TO LIB-CODIGO
+            MOVE WS-CSV-TITULO          TO LIB-TITULO
+            MOVE WS-CSV-AUTOR           TO LIB-AUTOR
+            MOVE WS-CSV-EDITORIAL       TO LIB-EDITORIAL
+            MOVE WS-CSV-ANIO            TO LIB-ANIO-PUBLICACION
+            MOVE WS-CSV-CATEGORIA       TO LIB-CATEGORIA
+            MOVE WS-CSV-STOCK           TO LIB-STOCK-TOTAL
+            MOVE WS-CSV-STOCK           TO LIB-STOCK-DISPONIBLE
+            MOVE WS-CSV-UBICACION       TO LIB-UBICACION
+            MOVE WS-FECHA-PROCESO       TO LIB-FECHA-ALTA
+            MOVE 'GRUPO 4'              TO LIB-USUARIO-ALTA
+            MOVE 'A'                    TO LIB-ESTADO.
       *
         GUARDAR-EN-DB2.
       *    INSERT EN DB2 - TABLA LIBROS
@@ -338,7 +361,7 @@
       *
        ESCRIBIR-ERROR.
            DISPLAY 'REGISTRO CON ERROR - LINEA: ' WS-CONT-LEIDOS
-           DISPLAY 'CODIGO: ' WS-ENT-CODIGO
+           DISPLAY 'CODIGO: ' WS-CSV-CODIGO
            ADD 1 TO WS-CONT-ERRORES.
       *
        ESCRIBIR-TOTALES.
