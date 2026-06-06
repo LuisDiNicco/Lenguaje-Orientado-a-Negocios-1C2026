@@ -1,0 +1,44 @@
+BIBPRES DFHMSD TYPE=&SYSPARM,MODE=INOUT,LANG=COBOL,CTRL=FREEKB,        X
+               TIOAPFX=YES
+PRES    DFHMDI SIZE=(24,80),LINE=1,COLUMN=1
+         DFHMDF POS=(01,25),LENGTH=30,                                 X
+               ATTRB=(BRT,PROT),                                       X
+               INITIAL='*** PRESTAMOS Y DEVOLUCIONES ***'
+         DFHMDF POS=(03,10),LENGTH=50,                                 X
+               ATTRB=(NORM,PROT),                                      X
+               INITIAL='SISTEMA DE GESTION BIBLIOTECARIA'
+         DFHMDF POS=(06,10),LENGTH=30,                                 X
+               ATTRB=(NORM,PROT),                                      X
+               INITIAL='TIPO TRANSACCION (P/D):'
+TRATIPO  DFHMDF POS=(06,42),LENGTH=1,                                  X
+               ATTRB=(NORM,UNPROT,IC,FSET),                            X
+               INITIAL=' '
+         DFHMDF POS=(06,44),LENGTH=1,ATTRB=(ASKIP,DRK)
+         DFHMDF POS=(08,10),LENGTH=30,                                 X
+               ATTRB=(NORM,PROT),                                      X
+               INITIAL='CODIGO DE USUARIO:'
+USUCODIGO DFHMDF POS=(08,42),LENGTH=10,                                X
+               ATTRB=(NORM,UNPROT,IC,FSET),                            X
+               INITIAL='          '
+         DFHMDF POS=(08,53),LENGTH=1,ATTRB=(ASKIP,DRK)
+         DFHMDF POS=(10,10),LENGTH=30,                                 X
+               ATTRB=(NORM,PROT),                                      X
+               INITIAL='CODIGO DE LIBRO:'
+CODCODIGO DFHMDF POS=(10,42),LENGTH=10,                                X
+               ATTRB=(NORM,UNPROT,IC,FSET),                            X
+               INITIAL='          '
+         DFHMDF POS=(10,53),LENGTH=1,ATTRB=(ASKIP,DRK)
+
+* --- AREA DE MENSAJES DE RESULTADO
+MSG      DFHMDF POS=(20,1),LENGTH=60,ATTRB=(BRT,PROT),INITIAL=' '
+*
+         DFHMDF POS=(22,10),LENGTH=30,                                 X
+               ATTRB=(NORM,PROT),                                      X
+               INITIAL='P = PRESTAMO  D = DEVOLUCION'
+*
+         DFHMDF POS=(24,10),LENGTH=50,                                 X
+               ATTRB=(NORM,PROT),                                      X
+               INITIAL='PF3=VOLVER AL MENU  ENTER=PROCESAR'
+
+         DFHMSD TYPE=FINAL
+         END
