@@ -35,9 +35,10 @@
       *
       * CONSTANTES Y VARIABLES DEL SISTEMA
       *
-           COPY CONSTANT.
-           COPY MENSAJES.
-           COPY PRESTAMO.
+            COPY CONSTANT.
+            COPY MENSAJES.
+            COPY USUARIO.
+            COPY PRESTAMO.
       *
       * DECLARACIONES DB2
       *
@@ -235,6 +236,5 @@
       *
       * RUTINAS DE UTILIDAD
       *
-       OBTENER-FECHA-PROCESO.
-           ACCEPT WS-FECHA-PROCESO FROM DATE YYYYMMDD
-           INSPECT WS-FECHA-PROCESO REPLACING ALL '/' BY '-'.
+        OBTENER-FECHA-PROCESO.
+            ACCEPT WS-FECHA-PROCESO FROM DATE YYYYMMDD.

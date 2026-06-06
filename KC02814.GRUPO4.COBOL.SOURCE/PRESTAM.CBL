@@ -106,9 +106,35 @@
        01  WS-NUMERO-PAGINA             PIC 9(3) VALUE 1.
        01  WS-CONTADOR-LINEAS           PIC 9(2) VALUE 99.
 
-      * TODO: AGREGAR DECLARACIONES DB2 (EXEC SQL INCLUDE SQLCA)
+      *
+      * DECLARACIONES DB2
+      *
+           EXEC SQL INCLUDE SQLCA END-EXEC.
+      *
+      * VARIABLES HOST PARA DB2
+      *
+       01  DCL-PRESTAMO.
+           05 DCL-PRES-NUMERO           PIC S9(8) USAGE COMP-3.
+           05 DCL-PRES-COD-LIBRO        PIC X(10).
+           05 DCL-PRES-COD-USUARIO      PIC X(10).
+           05 DCL-PRES-FECHA-PRESTAMO   PIC X(10).
+           05 DCL-PRES-FECHA-DEVOLUCION PIC X(10).
+           05 DCL-PRES-FECHA-LIMITE     PIC X(10).
+           05 DCL-PRES-ESTADO           PIC X(1).
+           05 DCL-PRES-MULTA            PIC S9(5)V99 USAGE COMP-3.
+           05 DCL-PRES-OBSERVACIONES    PIC X(100).
+      *
+       01  DCL-LIBRO-STOCK.
+           05 DCL-LIB-CODIGO-STK        PIC X(10).
+           05 DCL-LIB-STOCK-DISP        PIC S9(3) USAGE COMP-3.
+      *
+       01  DCL-USUARIO-PREST.
+           05 DCL-USU-CODIGO-PREST      PIC X(10).
+           05 DCL-USU-TIPO-PREST        PIC X(1).
+      *
+       01  DCL-CONTADOR-PRESTAMOS       PIC S9(2) USAGE COMP-3.
 
-       PROCEDURE DIVISION.
+        PROCEDURE DIVISION.
       *
       * PROGRAMA PRINCIPAL
       *
@@ -324,6 +350,5 @@
       *
       * RUTINAS DE UTILIDAD
       *
-       OBTENER-FECHA-PROCESO.
-           ACCEPT WS-FECHA-PROCESO FROM DATE YYYYMMDD
-           INSPECT WS-FECHA-PROCESO REPLACING ALL '/' BY '-'.
+        OBTENER-FECHA-PROCESO.
+            ACCEPT WS-FECHA-PROCESO FROM DATE YYYYMMDD.

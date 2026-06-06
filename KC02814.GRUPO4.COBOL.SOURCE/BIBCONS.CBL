@@ -18,10 +18,30 @@
            05 WS-FIRST-TIME    PIC X(1) VALUE 'Y'.
               88 PRIMERA-VEZ   VALUE 'Y'.
 
-       01  WS-RESP             PIC S9(8) COMP VALUE 0.
+        01  WS-RESP             PIC S9(8) COMP VALUE 0.
 
-      * TODO: DECLARAR AQUI VARIABLES HOST DB2 Y SQLCA
-      * EXEC SQL INCLUDE SQLCA END-EXEC
+      *
+      * DECLARACIONES DB2
+      *
+           EXEC SQL INCLUDE SQLCA END-EXEC.
+      *
+      * VARIABLES HOST DB2
+      *
+       01  DCL-LIBRO-CONS.
+           05 DCL-CONS-CODIGO            PIC X(10).
+           05 DCL-CONS-TITULO            PIC X(60).
+           05 DCL-CONS-AUTOR             PIC X(40).
+           05 DCL-CONS-EDITORIAL         PIC X(30).
+           05 DCL-CONS-ANIO              PIC S9(4) USAGE COMP-3.
+           05 DCL-CONS-CATEGORIA         PIC X(20).
+           05 DCL-CONS-STOCK-TOTAL       PIC S9(3) USAGE COMP-3.
+           05 DCL-CONS-STOCK-DISPONIBLE  PIC S9(3) USAGE COMP-3.
+           05 DCL-CONS-UBICACION         PIC X(10).
+       01  DCL-PAGINA-ACTUAL             PIC S9(4) USAGE COMP-3 VALUE 0.
+       01  DCL-TOTAL-RESULTADOS          PIC S9(4) USAGE COMP-3 VALUE 0.
+      *
+      * TODO: DECLARAR AQUI VARIABLES PARA CAMPOS DE BUSQUEDA
+      *
 
        PROCEDURE DIVISION.
 

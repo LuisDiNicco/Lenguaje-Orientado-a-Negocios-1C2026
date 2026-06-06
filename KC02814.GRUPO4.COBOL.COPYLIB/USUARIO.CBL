@@ -21,7 +21,8 @@
           05 USU-DIRECCION            PIC X(60).
           05 USU-FECHA-ALTA           PIC X(10).
           05 USU-FECHA-BAJA           PIC X(10).
-          05 USU-ESTADO               PIC X(1).
-             88 USU-ACTIVO            VALUE 'A'.
-             88 USU-INACTIVO          VALUE 'I'.
+           05 USU-ESTADO               PIC X(1).
+              88 USU-ACTIVO            VALUE 'A'.
+              88 USU-INACTIVO          VALUE 'I'.
+              88 USU-BAJA              VALUE 'B'.
           05 FILLER                   PIC X(7).

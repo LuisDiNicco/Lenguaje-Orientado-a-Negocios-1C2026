@@ -15,8 +15,8 @@
 //*  ARCHIVOS DE ENTRADA (SEGUN EL PROGRAMA)
 //* ---------------------------------------------------------------
 //ENTRADA  DD DSN=&SYSUID..DATA.INPUT,DISP=SHR
-//NOVEDAD  DD DSN=&SYSUID..DATA.NOVEDADES,DISP=SHR
-//*
+//NOVEDAD  DD DSN=&SYSUID..DATA.INPUT,DISP=SHR
+//TRANSAC  DD DSN=&SYSUID..DATA.INPUT,DISP=SHR
 //* ---------------------------------------------------------------
 //*  ARCHIVOS DE SALIDA (REPORTES)
 //* ---------------------------------------------------------------

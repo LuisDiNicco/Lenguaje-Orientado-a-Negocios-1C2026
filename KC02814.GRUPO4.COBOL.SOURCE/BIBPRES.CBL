@@ -24,11 +24,34 @@
 
        01  WS-RESP                   PIC S9(8) COMP VALUE 0.
 
-       01  WS-COD-USER              PIC X(10).
-       01  WS-COD-LIB               PIC X(10).
+        01  WS-COD-USER              PIC X(10).
+        01  WS-COD-LIB               PIC X(10).
 
-      * TODO: DECLARAR AQUI VARIABLES HOST DB2 Y SQLCA
-      * EXEC SQL INCLUDE SQLCA END-EXEC
+      *
+      * DECLARACIONES DB2
+      *
+           EXEC SQL INCLUDE SQLCA END-EXEC.
+      *
+      * VARIABLES HOST DB2
+      *
+       01  DCL-USUARIO-PRES.
+           05 DCL-UP-CODIGO              PIC X(10).
+           05 DCL-UP-TIPO                PIC X(1).
+           05 DCL-UP-ESTADO              PIC X(1).
+       01  DCL-LIBRO-PRES.
+           05 DCL-LP-CODIGO              PIC X(10).
+           05 DCL-LP-STOCK-DISP          PIC S9(3) USAGE COMP-3.
+           05 DCL-LP-ESTADO              PIC X(1).
+       01  DCL-PRESTAMO-PRES.
+           05 DCL-PP-NUMERO              PIC S9(8) USAGE COMP-3.
+           05 DCL-PP-FECHA-PRESTAMO      PIC X(10).
+           05 DCL-PP-FECHA-LIMITE        PIC X(10).
+           05 DCL-PP-ESTADO              PIC X(1).
+           05 DCL-PP-MULTA               PIC S9(5)V99 USAGE COMP-3.
+       01  DCL-CONTADOR-PRESTAMOS-PRES   PIC S9(2) USAGE COMP-3.
+      *
+      * TODO: COMPLETAR LOGICA DE VALIDACION DB2 EN TIEMPO REAL
+      *
 
        PROCEDURE DIVISION.
 
@@ -86,7 +109,7 @@
 
            MOVE TRATIPOI TO WS-TRANSACCION
            MOVE USUCODIGOI TO WS-COD-USER
-           MOVE CODI TO WS-COD-LIB
+           MOVE CODCODIGOI TO WS-COD-LIB
 
            EVALUATE TRUE
                WHEN ES-PRESTAMO
