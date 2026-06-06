@@ -247,8 +247,10 @@
        *          IF SQLCODE = 0 THEN codigo ya existe, error.
             PERFORM MOVER-DATOS-MAESTRO
             PERFORM GUARDAR-EN-DB2
-            PERFORM ESCRIBIR-DETALLE-REPORTE
-            ADD 1 TO WS-CONT-PROCESADOS.
+            IF WS-RESULTADO-OK
+                PERFORM ESCRIBIR-DETALLE-REPORTE
+                ADD 1 TO WS-CONT-PROCESADOS
+            END-IF.
        *
         MOVER-DATOS-MAESTRO.
             MOVE WS-CSV-CODIGO          TO LIB-CODIGO

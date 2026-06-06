@@ -278,64 +278,65 @@
                             WS-NOV-TIPO
            END-EVALUATE.
       *
-       PROCESAR-ALTA.
-      *    Validar email unico antes del INSERT
-           MOVE WS-NOV-EMAIL             TO DCL-USU-EMAIL
-           EXEC SQL
-               SELECT USU_EMAIL INTO :DCL-USU-EMAIL
-               FROM KC02814.USUARIOS
-               WHERE USU_EMAIL = :DCL-USU-EMAIL
-           END-EXEC.
-           IF SQLCODE = 0
-               MOVE 'N' TO WS-RESULTADO
-               DISPLAY 'ERROR: EMAIL YA EXISTE: ' WS-NOV-EMAIL
-               EXIT PARAGRAPH
-           END-IF.
+        PROCESAR-ALTA.
+       *    Validar email unico antes del INSERT
+            MOVE WS-NOV-EMAIL             TO DCL-USU-EMAIL
+            EXEC SQL
+                SELECT USU_EMAIL INTO :DCL-USU-EMAIL
+                FROM KC02814.USUARIOS
+                WHERE USU_EMAIL = :DCL-USU-EMAIL
+            END-EXEC.
+            IF SQLCODE = 0
+                MOVE 'N' TO WS-RESULTADO
+                DISPLAY 'ERROR: EMAIL YA EXISTE: ' WS-NOV-EMAIL
+                EXIT PARAGRAPH
+            END-IF.
 
-           MOVE WS-NOV-CODIGO            TO DCL-USU-CODIGO
-           MOVE WS-NOV-NOMBRE            TO DCL-USU-NOMBRE
-           MOVE WS-NOV-APELLIDO          TO DCL-USU-APELLIDO
-           MOVE WS-NOV-TIPO-USUARIO      TO DCL-USU-TIPO-USUARIO
-           MOVE WS-NOV-TELEFONO          TO DCL-USU-TELEFONO
-           MOVE WS-NOV-DIRECCION         TO DCL-USU-DIRECCION
-           MOVE WS-FECHA-PROCESO         TO DCL-USU-FECHA-ALTA
-           MOVE SPACES                   TO DCL-USU-FECHA-BAJA
-           MOVE 'A'                      TO DCL-USU-ESTADO
+            MOVE WS-NOV-CODIGO            TO DCL-USU-CODIGO
+            MOVE WS-NOV-NOMBRE            TO DCL-USU-NOMBRE
+            MOVE WS-NOV-APELLIDO          TO DCL-USU-APELLIDO
+            MOVE WS-NOV-TIPO-USUARIO      TO DCL-USU-TIPO-USUARIO
+            MOVE WS-NOV-TELEFONO          TO DCL-USU-TELEFONO
+            MOVE WS-NOV-DIRECCION         TO DCL-USU-DIRECCION
+            MOVE WS-FECHA-PROCESO         TO DCL-USU-FECHA-ALTA
+            MOVE SPACES                   TO DCL-USU-FECHA-BAJA
+            MOVE 'A'                      TO DCL-USU-ESTADO
 
-           EXEC SQL
-               INSERT INTO KC02814.USUARIOS
-                   (USU_CODIGO,
-                    USU_NOMBRE,
-                    USU_APELLIDO,
-                    USU_TIPO_USUARIO,
-                    USU_EMAIL,
-                    USU_TELEFONO,
-                    USU_DIRECCION,
-                    USU_FECHA_ALTA,
-                    USU_FECHA_BAJA,
-                    USU_ESTADO)
-               VALUES
-                   (:DCL-USU-CODIGO,
-                    :DCL-USU-NOMBRE,
-                    :DCL-USU-APELLIDO,
-                    :DCL-USU-TIPO-USUARIO,
-                    :DCL-USU-EMAIL,
-                    :DCL-USU-TELEFONO,
-                    :DCL-USU-DIRECCION,
-                    :DCL-USU-FECHA-ALTA,
-                    :DCL-USU-FECHA-BAJA,
-                    :DCL-USU-ESTADO)
-           END-EXEC.
+            EXEC SQL
+                INSERT INTO KC02814.USUARIOS
+                    (USU_CODIGO,
+                     USU_NOMBRE,
+                     USU_APELLIDO,
+                     USU_TIPO_USUARIO,
+                     USU_EMAIL,
+                     USU_TELEFONO,
+                     USU_DIRECCION,
+                     USU_FECHA_ALTA,
+                     USU_FECHA_BAJA,
+                     USU_ESTADO)
+                VALUES
+                    (:DCL-USU-CODIGO,
+                     :DCL-USU-NOMBRE,
+                     :DCL-USU-APELLIDO,
+                     :DCL-USU-TIPO-USUARIO,
+                     :DCL-USU-EMAIL,
+                     :DCL-USU-TELEFONO,
+                     :DCL-USU-DIRECCION,
+                     :DCL-USU-FECHA-ALTA,
+                     :DCL-USU-FECHA-BAJA,
+                     :DCL-USU-ESTADO)
+            END-EXEC.
 
-           IF SQLCODE = 0
-               ADD 1 TO WS-CONT-ALTAS
-               DISPLAY 'ALTA OK: ' WS-NOV-CODIGO
-               EXEC SQL COMMIT END-EXEC
-           ELSE
-               MOVE 'N' TO WS-RESULTADO
-               DISPLAY 'ERROR DB2 INSERT - SQLCODE: ' SQLCODE
-                       ' USUARIO: ' WS-NOV-CODIGO
-           END-IF.
+            IF SQLCODE = 0
+                ADD 1 TO WS-CONT-ALTAS
+                DISPLAY 'ALTA OK: ' WS-NOV-CODIGO
+                PERFORM ESCRIBIR-DETALLE
+                EXEC SQL COMMIT END-EXEC
+            ELSE
+                MOVE 'N' TO WS-RESULTADO
+                DISPLAY 'ERROR DB2 INSERT - SQLCODE: ' SQLCODE
+                        ' USUARIO: ' WS-NOV-CODIGO
+            END-IF.
       *
        PROCESAR-BAJA.
            MOVE 'B'                      TO DCL-USU-ESTADO
@@ -418,18 +419,26 @@
            MOVE 1 TO WS-CONTADOR-LINEAS
            ADD 1 TO WS-NUMERO-PAGINA.
       *
-       ESCRIBIR-DETALLE.
-           IF WS-CONTADOR-LINEAS > 55
-               PERFORM SALTO-PAGINA
-           END-IF
-           ADD 1 TO WS-CONTADOR-LINEAS.
+        ESCRIBIR-DETALLE.
+            IF WS-CONTADOR-LINEAS > 55
+                PERFORM SALTO-PAGINA
+            END-IF
+            ADD 1 TO WS-CONTADOR-LINEAS.
+      *    TODO: Escribir linea de detalle al reporte con los datos
+      *          de la transaccion procesada (tipo, codigo, nombre).
       *
-       ESCRIBIR-TOTALES.
-           DISPLAY '--- RESUMEN FINAL ---'
-           DISPLAY 'ALTAS: ' WS-CONT-ALTAS
-           DISPLAY 'BAJAS: ' WS-CONT-BAJAS
-           DISPLAY 'MODIFICACIONES: ' WS-CONT-MODIFICACIONES
-           DISPLAY 'ERRORES: ' WS-CONT-ERRORES.
+        ESCRIBIR-TOTALES.
+            MOVE WS-CONT-LEIDOS TO LIN-TOTAL-REGISTROS
+            WRITE REG-REPORTE FROM LINEA-TOTAL-REGISTROS
+                  AFTER ADVANCING 3 LINES
+            MOVE WS-CONT-ERRORES TO LIN-TOTAL-ERRORES
+            WRITE REG-REPORTE FROM LINEA-TOTAL-ERRORES
+                  AFTER ADVANCING 1 LINE
+            DISPLAY '--- RESUMEN FINAL ---'
+            DISPLAY 'ALTAS: ' WS-CONT-ALTAS
+            DISPLAY 'BAJAS: ' WS-CONT-BAJAS
+            DISPLAY 'MODIFICACIONES: ' WS-CONT-MODIFICACIONES
+            DISPLAY 'ERRORES: ' WS-CONT-ERRORES.
       *
       * RUTINAS DE UTILIDAD
       *

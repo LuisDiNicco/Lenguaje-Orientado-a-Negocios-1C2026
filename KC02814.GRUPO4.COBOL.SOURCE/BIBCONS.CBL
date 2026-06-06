@@ -54,7 +54,10 @@
                     PERFORM ENVIAR-MAPA-CON-DATOS
                WHEN EIBAID = DFHPF3
                     PERFORM VOLVER-AL-MENU
-                WHEN EIBAID = DFHPF7
+               WHEN EIBAID = DFHENTER
+                    PERFORM OBTENER-DATOS-DB2
+                    PERFORM ENVIAR-MAPA-CON-DATOS
+               WHEN EIBAID = DFHPF7
        *             TODO: DCL-PAGINA-ACTUAL = DCL-PAGINA-ACTUAL - 1
        *                   IF < 0 THEN MOVE 0
        *                   PERFORM OBTENER-DATOS-DB2
