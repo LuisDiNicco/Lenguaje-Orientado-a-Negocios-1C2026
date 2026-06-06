@@ -1,6 +1,6 @@
       *****************************************************************
-      * COPYBOOK: LIBROS                                              *
-      * PROPOSITO: ESTRUCTURA DE DATOS PARA LIBROS                    *
+       * COPYBOOK: LIBRO                                               *
+       * PROPOSITO: ESTRUCTURA DE DATOS PARA LIBROS                    *
       * AUTOR: GRUPO 4                                                *
       * FECHA: 23/05/2026                                             *
       * VERSION: 1.0                                                  *

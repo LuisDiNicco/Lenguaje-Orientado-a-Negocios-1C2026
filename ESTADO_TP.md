@@ -144,7 +144,7 @@
 
 ## 5. COPYBOOKS `[x]`
 
-- [x] LIBROS: 01 LIBRO-RECORD con 12 campos + 3 88-levels (A/I/B)
+- [x] LIBRO: 01 LIBRO-RECORD con 12 campos + 3 88-levels (A/I/B)
 - [x] USUARIO: 01 USUARIO-RECORD con 10 campos + 5 88-levels (E/D/A, A/I/B)
 - [x] PRESTAMO: 01 PRESTAMO-RECORD con 9 campos + 3 88-levels (P/D/V)
 - [x] CONSTANT: reglas negocio (3/15, 10/30, 5/20, $50/día) + parámetros reportes

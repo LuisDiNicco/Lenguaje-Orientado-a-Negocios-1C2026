@@ -72,7 +72,7 @@
       * ESTRUCTURA LIBROS
       *
        01  WS-LIBRO-TRABAJO.
-           COPY LIBROS.
+            COPY LIBRO.
       *
       * AREAS DE TRABAJO
       *

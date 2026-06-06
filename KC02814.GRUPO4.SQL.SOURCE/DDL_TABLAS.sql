@@ -77,7 +77,7 @@ COMMIT;
 
 -- --------------------------------------------------------------
 -- PASO 3: CREAR TABLA LIBROS
---          Columnas segun copybook LIBROS.CBL
+--          Columnas segun copybook LIBRO.CBL
 -- --------------------------------------------------------------
 
 CREATE TABLE KC02814.LIBROS (
