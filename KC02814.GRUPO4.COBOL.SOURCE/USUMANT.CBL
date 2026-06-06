@@ -4,13 +4,11 @@
        DATE-WRITTEN. 06/06/2026.
       *****************************************************************
       * PROGRAMA: USUMANT - MANTENIMIENTO DE USUARIOS                 *
-      * DESCRIPCION: PROCESA ARCHIVO DE NOVEDADES (ALTA/BAJA/MOD)     *
+      * DESCRIPCION: PROCESA ARCHIVO CSV DE NOVEDADES (ALTA/BAJA/MOD) *
       *              Y ACTUALIZA LA BASE DB2                           *
-      * FORMATO ENTRADA: Registros de ancho fijo con separadores de   *
-      *                  1 byte entre campos.                          *
-      *                  TIPO(A/B/M)|CODIGO(10)|NOMBRE(30)|...        *
-      * TODO: Adaptar a formato CSV si el archivo de entrada usa      *
-      *       comas como delimitador (UNSTRING DELIMITED BY ',').     *
+      * FORMATO ENTRADA: CSV con header. Campos delimitados por coma: *
+      *   TIPO,CODIGO,NOMBRE,APELLIDO,TIPO_USUARIO,EMAIL,TELEFONO,   *
+      *   DIRECCION                                                    *
       *****************************************************************
 
        ENVIRONMENT DIVISION.
@@ -32,10 +30,10 @@
        DATA DIVISION.
        FILE SECTION.
         FD  ARCHIVO-NOVEDADES
-            RECORD CONTAINS 210 CHARACTERS
-           BLOCK CONTAINS 0 RECORDS
-           DATA RECORD IS REG-NOVEDAD.
-       01  REG-NOVEDAD                 PIC X(200).
+            RECORD CONTAINS 500 CHARACTERS
+            BLOCK CONTAINS 0 RECORDS
+            DATA RECORD IS REG-NOVEDAD.
+        01  REG-NOVEDAD                 PIC X(500).
 
        FD  ARCHIVO-REPORTE
            RECORDING MODE IS F
@@ -96,28 +94,29 @@
            05 WS-STATUS-REPORTE         PIC X(2) VALUE '00'.
               88 WS-REPORTE-OK          VALUE '00'.
       *
-      * REGISTRO DE NOVEDAD (ENTRADA)
+      * LINEA CSV COMPLETA
+      *
+       01  WS-CSV-LINE                  PIC X(500).
+      *
+      * REGISTRO DE NOVEDAD (CAMPOS PARSEADOS DEL CSV)
       *
        01  WS-REGISTRO-NOVEDAD.
            05 WS-NOV-TIPO               PIC X(1).
               88 WS-NOV-ALTA            VALUE 'A'.
               88 WS-NOV-BAJA            VALUE 'B'.
               88 WS-NOV-MODIFICACION    VALUE 'M'.
-           05 FILLER                    PIC X(1).
            05 WS-NOV-CODIGO             PIC X(10).
-           05 FILLER                    PIC X(1).
            05 WS-NOV-NOMBRE             PIC X(30).
-           05 FILLER                    PIC X(1).
            05 WS-NOV-APELLIDO           PIC X(30).
-           05 FILLER                    PIC X(1).
            05 WS-NOV-TIPO-USUARIO       PIC X(1).
-           05 FILLER                    PIC X(1).
            05 WS-NOV-EMAIL              PIC X(50).
-           05 FILLER                    PIC X(1).
            05 WS-NOV-TELEFONO           PIC X(20).
-           05 FILLER                    PIC X(1).
            05 WS-NOV-DIRECCION          PIC X(60).
-           05 FILLER                    PIC X(1).
+      *
+      * FLAG PARA DETECTAR PRIMER REGISTRO (HEADER DEL CSV)
+      *
+       01  WS-PRIMER-REGISTRO           PIC X(1) VALUE 'S'.
+          88 WS-ES-HEADER               VALUE 'S'.
       *
       * VARIABLES DE TRABAJO
       *
@@ -188,10 +187,29 @@
            END-IF.
       *
        LEER-NOVEDAD.
-           READ ARCHIVO-NOVEDADES INTO WS-REGISTRO-NOVEDAD
+           READ ARCHIVO-NOVEDADES INTO WS-CSV-LINE
                AT END MOVE 'S' TO WS-FIN-ARCHIVO
-               NOT AT END ADD 1 TO WS-CONT-LEIDOS
+               NOT AT END
+                   IF WS-ES-HEADER
+                       MOVE 'N' TO WS-PRIMER-REGISTRO
+                   ELSE
+                       PERFORM PARSE-CSV
+                       ADD 1 TO WS-CONT-LEIDOS
+                   END-IF
            END-READ.
+      *
+       PARSE-CSV.
+           MOVE SPACES TO WS-REGISTRO-NOVEDAD
+           UNSTRING WS-CSV-LINE DELIMITED BY ','
+               INTO WS-NOV-TIPO
+                    WS-NOV-CODIGO
+                    WS-NOV-NOMBRE
+                    WS-NOV-APELLIDO
+                    WS-NOV-TIPO-USUARIO
+                    WS-NOV-EMAIL
+                    WS-NOV-TELEFONO
+                    WS-NOV-DIRECCION
+           END-UNSTRING.
       *
        CERRAR-ARCHIVOS.
            CLOSE ARCHIVO-NOVEDADES

@@ -7,11 +7,8 @@
       * PROGRAMA: PRESTAM - PROCESAMIENTO DE PRESTAMOS Y DEVOLUCIONES *
       * DESCRIPCION: PROCESA TRANSACCIONES DE PRESTAMO/DEVOLUCION     *
       *              VALIDA REGLAS DE NEGOCIO Y ACTUALIZA DB2          *
-      * FORMATO ENTRADA: Registros de ancho fijo con separadores de   *
-      *                  1 byte entre campos.                          *
-      *                  TIPO(P/D)|USUARIO(10)|LIBRO(10)|FECHA(10)    *
-      * TODO: Adaptar a formato CSV si el archivo de entrada usa      *
-      *       comas como delimitador (UNSTRING DELIMITED BY ',').     *
+      * FORMATO ENTRADA: CSV con header. Campos delimitados por coma: *
+      *   TIPO,COD_USUARIO,COD_LIBRO,FECHA                             *
       *****************************************************************
 
        ENVIRONMENT DIVISION.
@@ -33,10 +30,10 @@
        DATA DIVISION.
        FILE SECTION.
        FD  ARCHIVO-TRANSACCIONES
-           RECORD CONTAINS 150 CHARACTERS
+           RECORD CONTAINS 500 CHARACTERS
            BLOCK CONTAINS 0 RECORDS
            DATA RECORD IS REG-TRANSACCION.
-       01  REG-TRANSACCION              PIC X(150).
+       01  REG-TRANSACCION              PIC X(500).
 
        FD  ARCHIVO-REPORTE
            RECORDING MODE IS F
@@ -79,19 +76,24 @@
            05 WS-STATUS-REPORTE         PIC X(2) VALUE '00'.
               88 WS-REPORTE-OK          VALUE '00'.
       *
-      * REGISTRO DE TRANSACCION ENTRADA
+      * LINEA CSV COMPLETA
+      *
+       01  WS-CSV-LINE                  PIC X(500).
+      *
+      * REGISTRO DE TRANSACCION (CAMPOS PARSEADOS DEL CSV)
       *
        01  WS-TRANSACCION.
            05 WS-TRANS-TIPO             PIC X(1).
               88 TRANS-PRESTAMO         VALUE 'P'.
               88 TRANS-DEVOLUCION       VALUE 'D'.
-           05 FILLER                    PIC X(1).
            05 WS-TRANS-COD-USUARIO      PIC X(10).
-           05 FILLER                    PIC X(1).
            05 WS-TRANS-COD-LIBRO        PIC X(10).
-           05 FILLER                    PIC X(1).
            05 WS-TRANS-FECHA            PIC X(10).
-           05 FILLER                    PIC X(116).
+      *
+      * FLAG PARA DETECTAR PRIMER REGISTRO (HEADER DEL CSV)
+      *
+       01  WS-PRIMER-REGISTRO           PIC X(1) VALUE 'S'.
+          88 WS-ES-HEADER               VALUE 'S'.
       *
       * AREAS DE TRABAJO PARA REGLAS DE NEGOCIO
       *
@@ -204,10 +206,25 @@
            END-IF.
       *
        LEER-TRANSACCION.
-           READ ARCHIVO-TRANSACCIONES INTO WS-TRANSACCION
+           READ ARCHIVO-TRANSACCIONES INTO WS-CSV-LINE
                AT END MOVE 'S' TO WS-FIN-ARCHIVO
-               NOT AT END ADD 1 TO WS-CONT-LEIDOS
+               NOT AT END
+                   IF WS-ES-HEADER
+                       MOVE 'N' TO WS-PRIMER-REGISTRO
+                   ELSE
+                       PERFORM PARSE-CSV
+                       ADD 1 TO WS-CONT-LEIDOS
+                   END-IF
            END-READ.
+      *
+       PARSE-CSV.
+           MOVE SPACES TO WS-TRANSACCION
+           UNSTRING WS-CSV-LINE DELIMITED BY ','
+               INTO WS-TRANS-TIPO
+                    WS-TRANS-COD-USUARIO
+                    WS-TRANS-COD-LIBRO
+                    WS-TRANS-FECHA
+           END-UNSTRING.
       *
        CERRAR-ARCHIVOS.
            CLOSE ARCHIVO-TRANSACCIONES
