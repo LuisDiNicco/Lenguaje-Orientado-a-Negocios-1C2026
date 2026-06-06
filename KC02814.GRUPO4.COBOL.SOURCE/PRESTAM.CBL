@@ -247,66 +247,124 @@
                PERFORM ESCRIBIR-DETALLE-REPORTE
            END-IF.
       *
-      * VALIDACIONES DE NEGOCIO
-      *
-       VALIDAR-USUARIO.
-      *    TODO: EXEC SQL SELECT PARA VERIFICAR QUE USUARIO EXISTE
-      *          Y ESTA ACTIVO
-           IF WS-TRANS-COD-USUARIO = SPACES
-               MOVE 'N' TO WS-RESULTADO
-               DISPLAY 'ERROR: CODIGO USUARIO VACIO'
-           END-IF.
-      *
-       VALIDAR-LIBRO.
-      *    TODO: EXEC SQL SELECT PARA VERIFICAR STOCK DISPONIBLE
-      *          DEL LIBRO Y QUE ESTE ACTIVO
-           IF WS-TRANS-COD-LIBRO = SPACES
-               MOVE 'N' TO WS-RESULTADO
-               DISPLAY 'ERROR: CODIGO LIBRO VACIO'
-           END-IF.
-      *
-       VALIDAR-TOPE-USUARIO.
-      *    Reglas de negocio (CONSTANT.CBL):
-      *    - ESTUDIANTE (E): max 3 libros
-      *    - DOCENTE (D): max 10 libros
-      *    - ADMINISTRATIVO (A): max 5 libros
-      *    TODO: EXEC SQL SELECT COUNT PARA VERIFICAR TOPE
-           DISPLAY 'VALIDANDO TOPE DE PRESTAMOS'.
-      *
-       CALCULAR-FECHAS-PRESTAMO.
-      *    Reglas (CONSTANT.CBL):
-      *    - ESTUDIANTE: 15 dias
-      *    - DOCENTE: 30 dias
-      *    - ADMINISTRATIVO: 20 dias
-      *    TODO: USAR WS-FECHA-PROCESO Y SUMAR DIAS SEGUN TIPO
-           DISPLAY 'CALCULANDO FECHA LIMITE'.
-      *
-       BUSCAR-PRESTAMO-PENDIENTE.
-      *    TODO: EXEC SQL SELECT PARA ENCONTRAR PRESTAMO PENDIENTE
-      *          DEL USUARIO Y LIBRO
-           DISPLAY 'BUSCANDO PRESTAMO PENDIENTE'.
-      *
-       CALCULAR-MULTA.
-      *    Si la devolucion supera la fecha limite:
-      *    dias_atraso * CONST-MULTA-DIA
-      *    TODO: Calcular diferencia de dias
-           DISPLAY 'CALCULANDO MULTA SI CORRESPONDE'.
-      *
-      * OPERACIONES DB2
-      *
-       REGISTRAR-PRESTAMO-DB2.
-      *    TODO: EXEC SQL INSERT INTO PRESTAMOS ...
-      *    TODO: EXEC SQL UPDATE LIBROS SET STOCK_DISPONIBLE = ...
-           DISPLAY 'SIMULANDO INSERT PRESTAMO DB2 PARA: '
-                   WS-TRANS-COD-USUARIO
-                   ' LIBRO: ' WS-TRANS-COD-LIBRO.
-      *
-       REGISTRAR-DEVOLUCION-DB2.
-      *    TODO: EXEC SQL UPDATE PRESTAMOS SET ESTADO = 'D' ...
-      *    TODO: EXEC SQL UPDATE LIBROS SET STOCK_DISPONIBLE = ...
-           DISPLAY 'SIMULANDO UPDATE DEVOLUCION DB2 PARA: '
-                   WS-TRANS-COD-USUARIO
-                   ' LIBRO: ' WS-TRANS-COD-LIBRO.
+       * VALIDACIONES DE NEGOCIO
+       *
+        VALIDAR-USUARIO.
+            IF WS-TRANS-COD-USUARIO = SPACES
+                MOVE 'N' TO WS-RESULTADO
+                DISPLAY 'ERROR: CODIGO USUARIO VACIO'
+                EXIT PARAGRAPH
+            END-IF.
+       *    TODO: EXEC SQL SELECT USU_CODIGO, USU_TIPO_USUARIO
+       *          INTO :DCL-USU-CODIGO-PREST, :DCL-USU-TIPO-PREST
+       *          FROM KC02814.USUARIOS
+       *          WHERE USU_CODIGO = :WS-TRANS-COD-USUARIO
+       *            AND USU_ESTADO = 'A'
+       *          IF SQLCODE NOT = 0 THEN MOVE 'N' TO WS-RESULTADO
+       *          END-EXEC.
+       *
+       *    TODO: Verificar que el usuario no tenga prestamos vencidos
+       *          SELECT COUNT(*) INTO :DCL-CONTADOR-PRESTAMOS
+       *          FROM KC02814.PRESTAMOS
+       *          WHERE PRES_CODIGO_USUARIO = :WS-TRANS-COD-USUARIO
+       *            AND (PRES_ESTADO = 'V'
+       *              OR (PRES_ESTADO = 'P'
+       *                  AND PRES_FECHA_LIMITE < CURRENT DATE))
+       *          IF COUNT > 0 THEN no permitir prestamo (consigna p3)
+       *          END-EXEC.
+       *
+        VALIDAR-LIBRO.
+            IF WS-TRANS-COD-LIBRO = SPACES
+                MOVE 'N' TO WS-RESULTADO
+                DISPLAY 'ERROR: CODIGO LIBRO VACIO'
+                EXIT PARAGRAPH
+            END-IF.
+       *    TODO: EXEC SQL SELECT LIB_STOCK_DISPONIBLE
+       *          INTO :DCL-LIB-STOCK-DISP
+       *          FROM KC02814.LIBROS
+       *          WHERE LIB_CODIGO = :WS-TRANS-COD-LIBRO
+       *            AND LIB_ESTADO = 'A'
+       *          IF SQLCODE NOT = 0 OR DCL-LIB-STOCK-DISP <= 0
+       *          THEN MOVE 'N' TO WS-RESULTADO
+       *          END-EXEC.
+       *
+        VALIDAR-TOPE-USUARIO.
+       *    TODO: EXEC SQL SELECT COUNT(*)
+       *          INTO :DCL-CONTADOR-PRESTAMOS
+       *          FROM KC02814.PRESTAMOS
+       *          WHERE PRES_CODIGO_USUARIO = :WS-TRANS-COD-USUARIO
+       *            AND PRES_ESTADO = 'P'
+       *          END-EXEC.
+       *    TODO: Comparar DCL-USU-TIPO-PREST:
+       *          'E' -> CONST-MAX-LIBROS-EST (3)
+       *          'D' -> CONST-MAX-LIBROS-DOC (10)
+       *          'A' -> CONST-MAX-LIBROS-ADM (5)
+       *          IF DCL-CONTADOR-PRESTAMOS >= limite THEN error.
+       *
+        CALCULAR-FECHAS-PRESTAMO.
+       *    TODO: Determinar dias segun tipo usuario:
+       *          'E' -> MOVE CONST-DIAS-PRESTAMO-EST TO WS-DIAS-PRESTAMO
+       *          'D' -> MOVE CONST-DIAS-PRESTAMO-DOC TO WS-DIAS-PRESTAMO
+       *          'A' -> MOVE CONST-DIAS-PRESTAMO-ADM TO WS-DIAS-PRESTAMO
+       *    TODO: Sumar WS-DIAS-PRESTAMO a WS-FECHA-PROCESO usando
+       *          FUNCTION INTEGER-OF-DATE + FUNCTION DATE-OF-INTEGER
+       *          para obtener WS-FECHA-LIMITE (formato YYYYMMDD).
+       *
+        BUSCAR-PRESTAMO-PENDIENTE.
+       *    TODO: EXEC SQL SELECT PRES_NUMERO, PRES_FECHA_LIMITE
+       *          INTO :DCL-PRES-NUMERO, :DCL-PRES-FECHA-LIMITE
+       *          FROM KC02814.PRESTAMOS
+       *          WHERE PRES_CODIGO_USUARIO = :WS-TRANS-COD-USUARIO
+       *            AND PRES_CODIGO_LIBRO = :WS-TRANS-COD-LIBRO
+       *            AND PRES_ESTADO = 'P'
+       *          IF SQLCODE NOT = 0 THEN no hay prestamo pendiente
+       *          END-EXEC.
+       *
+        CALCULAR-MULTA.
+       *    TODO: Calcular dias de atraso:
+       *          dias_atraso = WS-FECHA-PROCESO - PRES-FECHA-LIMITE
+       *          usando FUNCTION INTEGER-OF-DATE en ambas fechas
+       *          IF dias_atraso > 0 THEN
+       *            COMPUTE WS-MULTA-CALCULADA =
+       *                    dias_atraso * CONST-MULTA-DIA
+       *          ELSE MOVE ZERO TO WS-MULTA-CALCULADA.
+       *
+       * OPERACIONES DB2
+       *
+        REGISTRAR-PRESTAMO-DB2.
+       *    TODO: EXEC SQL
+       *          INSERT INTO KC02814.PRESTAMOS
+       *            (PRES_NUMERO, PRES_CODIGO_LIBRO, PRES_CODIGO_USUARIO,
+       *             PRES_FECHA_PRESTAMO, PRES_FECHA_DEVOLUCION,
+       *             PRES_FECHA_LIMITE, PRES_ESTADO, PRES_MULTA,
+       *             PRES_OBSERVACIONES)
+       *          VALUES
+       *            (NEXT VALUE FOR KC02814.SEQ_PRESTAMOS,
+       *             :WS-TRANS-COD-LIBRO, :WS-TRANS-COD-USUARIO,
+       *             :WS-FECHA-PROCESO, SPACES,
+       *             :WS-FECHA-LIMITE, 'P', 0, SPACES)
+       *          END-EXEC.
+       *    TODO: EXEC SQL
+       *          UPDATE KC02814.LIBROS
+       *          SET LIB_STOCK_DISPONIBLE = LIB_STOCK_DISPONIBLE - 1
+       *          WHERE LIB_CODIGO = :WS-TRANS-COD-LIBRO
+       *          END-EXEC.
+       *    TODO: IF SQLCODE = 0 THEN EXEC SQL COMMIT END-EXEC.
+       *
+        REGISTRAR-DEVOLUCION-DB2.
+       *    TODO: EXEC SQL
+       *          UPDATE KC02814.PRESTAMOS
+       *          SET PRES_ESTADO = 'D',
+       *              PRES_FECHA_DEVOLUCION = :WS-FECHA-PROCESO,
+       *              PRES_MULTA = :WS-MULTA-CALCULADA
+       *          WHERE PRES_NUMERO = :DCL-PRES-NUMERO
+       *          END-EXEC.
+       *    TODO: EXEC SQL
+       *          UPDATE KC02814.LIBROS
+       *          SET LIB_STOCK_DISPONIBLE = LIB_STOCK_DISPONIBLE + 1
+       *          WHERE LIB_CODIGO = :WS-TRANS-COD-LIBRO
+       *          END-EXEC.
+       *    TODO: IF SQLCODE = 0 THEN EXEC SQL COMMIT END-EXEC.
       *
       * RUTINAS DE REPORTE
       *

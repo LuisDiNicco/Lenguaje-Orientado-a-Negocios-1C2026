@@ -105,10 +105,14 @@
            PERFORM FINALIZAR
            STOP RUN.
       *
-       INICIALIZAR.
-           DISPLAY 'INICIANDO PROGRAMA REPORTES'
-           PERFORM OBTENER-FECHA-PROCESO
-           PERFORM ABRIR-ARCHIVOS.
+        INICIALIZAR.
+            DISPLAY 'INICIANDO PROGRAMA REPORTES'
+            PERFORM OBTENER-FECHA-PROCESO
+       *    TODO: Leer parametros de fecha (consigna: "Entrada parametros fechas")
+       *          Agregar SELECT a archivo de parametros o usar ACCEPT
+       *          Variables: WS-FECHA-DESDE, WS-FECHA-HASTA PIC X(10)
+       *          Si no se proveen, usar mes actual como default
+            PERFORM ABRIR-ARCHIVOS.
       *
        GENERAR-REPORTES.
            PERFORM REPORTE-LIBROS-MAS-PRESTADOS

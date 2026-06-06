@@ -10,6 +10,8 @@
 
        ENVIRONMENT DIVISION.
        CONFIGURATION SECTION.
+       SOURCE-COMPUTER. IBM-3090.
+       OBJECT-COMPUTER. IBM-3090.
        INPUT-OUTPUT SECTION.
        FILE-CONTROL.
            SELECT ARCHIVO-ENTRADA ASSIGN TO ENTRADA
@@ -186,36 +188,44 @@
            CLOSE ARCHIVO-ENTRADA
            CLOSE ARCHIVO-REPORTE.
       *
-      * RUTINAS DE PROCESO
-      *
-       VALIDAR-REGISTRO.
-           MOVE 'S' TO WS-RESULTADO
+       * RUTINAS DE PROCESO
+       *
+        VALIDAR-REGISTRO.
+            MOVE 'S' TO WS-RESULTADO
 
-           IF WS-ENT-CODIGO = SPACES
-               MOVE 'N' TO WS-RESULTADO
-           END-IF
+            IF WS-ENT-CODIGO = SPACES
+                MOVE 'N' TO WS-RESULTADO
+            END-IF
 
-           IF WS-ENT-TITULO = SPACES
-               MOVE 'N' TO WS-RESULTADO
-           END-IF
+            IF WS-ENT-TITULO = SPACES
+                MOVE 'N' TO WS-RESULTADO
+            END-IF
 
-           IF WS-ENT-AUTOR = SPACES
-               MOVE 'N' TO WS-RESULTADO
-           END-IF
+            IF WS-ENT-AUTOR = SPACES
+                MOVE 'N' TO WS-RESULTADO
+            END-IF
 
-           IF WS-ENT-ANIO NOT NUMERIC
-               MOVE 'N' TO WS-RESULTADO
-           END-IF
+            IF WS-ENT-ANIO NOT NUMERIC
+                MOVE 'N' TO WS-RESULTADO
+            END-IF
+       *    TODO: Validar que WS-ENT-ANIO este entre 1900 y 2100
 
-           IF WS-ENT-STOCK NOT NUMERIC
-               MOVE 'N' TO WS-RESULTADO
-           END-IF.
-      *
-       PROCESAR-REGISTRO.
-           PERFORM MOVER-DATOS-MAESTRO
-           PERFORM GUARDAR-EN-DB2
-           PERFORM ESCRIBIR-DETALLE-REPORTE
-           ADD 1 TO WS-CONT-PROCESADOS.
+            IF WS-ENT-STOCK NOT NUMERIC
+                MOVE 'N' TO WS-RESULTADO
+            END-IF.
+       *    TODO: Validar que WS-ENT-STOCK > 0
+       *
+        PROCESAR-REGISTRO.
+       *    TODO: Validar codigo unico antes del INSERT:
+       *          EXEC SQL SELECT LIB_CODIGO INTO :DCL-LIB-CODIGO
+       *          FROM KC02814.LIBROS
+       *          WHERE LIB_CODIGO = :WS-ENT-CODIGO
+       *          END-EXEC.
+       *          IF SQLCODE = 0 THEN codigo ya existe, error.
+            PERFORM MOVER-DATOS-MAESTRO
+            PERFORM GUARDAR-EN-DB2
+            PERFORM ESCRIBIR-DETALLE-REPORTE
+            ADD 1 TO WS-CONT-PROCESADOS.
       *
        MOVER-DATOS-MAESTRO.
            MOVE WS-ENT-CODIGO          TO LIB-CODIGO
@@ -277,6 +287,7 @@
 
            IF SQLCODE = 0
                DISPLAY 'INSERT DB2 OK: ' LIB-CODIGO
+               EXEC SQL COMMIT END-EXEC
            ELSE
                DISPLAY 'ERROR DB2 SQLCODE: ' SQLCODE
                        ' PARA LIBRO: ' LIB-CODIGO

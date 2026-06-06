@@ -122,26 +122,54 @@
 
            PERFORM ENVIAR-MAPA-CON-DATOS.
 
-      *--------------------------------------------------------------
-      *   PROCESAR PRESTAMO
-      *--------------------------------------------------------------
-       PROCESAR-PRESTAMO-CICS.
-      *    TODO: EXEC SQL PARA VALIDAR USUARIO EXISTE Y ESTA ACTIVO
-      *    TODO: EXEC SQL PARA VALIDAR LIBRO EXISTE Y TIENE STOCK
-      *    TODO: EXEC SQL PARA VALIDAR TOPE PRESTAMOS USUARIO
-      *    TODO: EXEC SQL INSERT INTO PRESTAMOS
-      *    TODO: EXEC SQL UPDATE LIBROS SET STOCK DISPONIBLE - 1
-           MOVE 'PRESTAMO REGISTRADO OK' TO WS-MENSAJE.
+       *--------------------------------------------------------------
+       *   PROCESAR PRESTAMO (VALIDACION DB2 EN TIEMPO REAL)
+       *--------------------------------------------------------------
+        PROCESAR-PRESTAMO-CICS.
+       *    TODO: Validar que WS-COD-USER y WS-COD-LIB no esten vacios
+       *    TODO: EXEC SQL SELECT USU_ESTADO, USU_TIPO_USUARIO
+       *          INTO :DCL-UP-ESTADO, :DCL-UP-TIPO
+       *          FROM KC02814.USUARIOS
+       *          WHERE USU_CODIGO = :WS-COD-USER AND USU_ESTADO = 'A'
+       *    TODO: EXEC SQL SELECT LIB_STOCK_DISPONIBLE, LIB_ESTADO
+       *          INTO :DCL-LP-STOCK-DISP, :DCL-LP-ESTADO
+       *          FROM KC02814.LIBROS
+       *          WHERE LIB_CODIGO = :WS-COD-LIB
+       *            AND LIB_ESTADO = 'A' AND LIB_STOCK_DISPONIBLE > 0
+       *    TODO: EXEC SQL SELECT COUNT(*) INTO :DCL-CONTADOR-PRESTAMOS-PRES
+       *          FROM KC02814.PRESTAMOS
+       *          WHERE PRES_CODIGO_USUARIO = :WS-COD-USER
+       *            AND PRES_ESTADO = 'P'
+       *    TODO: Comparar con CONST-MAX-LIBROS-* segun DCL-UP-TIPO
+       *    TODO: Verificar que usuario no tenga prestamos vencidos
+       *    TODO: EXEC SQL INSERT INTO KC02814.PRESTAMOS ...
+       *          con NEXT VALUE FOR KC02814.SEQ_PRESTAMOS
+       *    TODO: EXEC SQL UPDATE KC02814.LIBROS
+       *          SET LIB_STOCK_DISPONIBLE = LIB_STOCK_DISPONIBLE - 1
+       *    TODO: EXEC SQL COMMIT END-EXEC
+            MOVE 'PRESTAMO REGISTRADO OK' TO WS-MENSAJE.
 
-      *--------------------------------------------------------------
-      *   PROCESAR DEVOLUCION
-      *--------------------------------------------------------------
-       PROCESAR-DEVOLUCION-CICS.
-      *    TODO: EXEC SQL PARA BUSCAR PRESTAMO PENDIENTE
-      *    TODO: EXEC SQL PARA CALCULAR MULTA SI CORRESPONDE
-      *    TODO: EXEC SQL UPDATE PRESTAMOS SET ESTADO = 'D'
-      *    TODO: EXEC SQL UPDATE LIBROS SET STOCK DISPONIBLE + 1
-           MOVE 'DEVOLUCION REGISTRADA OK' TO WS-MENSAJE.
+       *--------------------------------------------------------------
+       *   PROCESAR DEVOLUCION
+       *--------------------------------------------------------------
+        PROCESAR-DEVOLUCION-CICS.
+       *    TODO: EXEC SQL SELECT PRES_NUMERO, PRES_FECHA_LIMITE
+       *          INTO :DCL-PP-NUMERO, :DCL-PP-FECHA-LIMITE
+       *          FROM KC02814.PRESTAMOS
+       *          WHERE PRES_CODIGO_USUARIO = :WS-COD-USER
+       *            AND PRES_CODIGO_LIBRO = :WS-COD-LIB
+       *            AND PRES_ESTADO = 'P'
+       *    TODO: Calcular dias atraso y multa con CONST-MULTA-DIA
+       *    TODO: EXEC SQL UPDATE KC02814.PRESTAMOS
+       *          SET PRES_ESTADO = 'D',
+       *              PRES_FECHA_DEVOLUCION = CURRENT DATE,
+       *              PRES_MULTA = :DCL-PP-MULTA
+       *          WHERE PRES_NUMERO = :DCL-PP-NUMERO
+       *    TODO: EXEC SQL UPDATE KC02814.LIBROS
+       *          SET LIB_STOCK_DISPONIBLE = LIB_STOCK_DISPONIBLE + 1
+       *          WHERE LIB_CODIGO = :WS-COD-LIB
+       *    TODO: EXEC SQL COMMIT END-EXEC
+            MOVE 'DEVOLUCION REGISTRADA OK' TO WS-MENSAJE.
 
       *--------------------------------------------------------------
       *   ENVIAR MAPA CON DATOS Y MENSAJE

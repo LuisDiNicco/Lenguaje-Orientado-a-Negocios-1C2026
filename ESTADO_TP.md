@@ -1,193 +1,185 @@
 # ESTADO DEL TRABAJO PRÁCTICO INTEGRADOR FINAL
 ## Sistema de Gestión de Biblioteca Universitaria - Grupo 4 (KC02814)
 
-**Referencias de estado:**
-- `[x]` Código fuente completo
-- `[-]` Pendiente de compilación y prueba en mainframe
+**Leyenda de estado:**
+- `[x]` Completado y validado
+- `[-]` Parcialmente implementado (estructura lista, lógica incompleta)
 - `[ ]` No implementado
 
 ---
 
-## 1. PROGRAMAS BATCH (COBOL + DB2)
+## 1. PROGRAMAS BATCH
 
-### 1.1 CARGINI - Carga Inicial de Libros `[x]`
-- **Entrada:** Archivo CSV con datos de libros (código, título, autor, editorial, año, categoría, stock, ubicación)
-- **Salida:** Tabla LIBROS actualizada + Reporte de carga paginado
-- **Validaciones:** Código no vacío, título no vacío, autor no vacío, año numérico, stock numérico
-- **DB2:** EXEC SQL INSERT INTO KC02814.LIBROS con 12 columnas. Control de SQLCODE post-insert.
-- **Reporte:** Cabecera institucional, detalle por libro, totales de registros y errores. Paginación cada 55 líneas.
-- **Archivo:** `KC02814.GRUPO4.COBOL.SOURCE(CARGINI)`
+### 1.1 CARGINI - Carga Inicial de Libros `[-]`
+- [x] Estructura COBOL (4 divisiones, columnas, SELECT, FD, WORKING-STORAGE)
+- [x] Lectura secuencial PERFORM UNTIL (patrón PDF 08)
+- [x] EXEC SQL INCLUDE SQLCA + host variables COMP-3
+- [x] EXEC SQL INSERT INTO KC02814.LIBROS con 12 columnas
+- [x] EXEC SQL COMMIT post-INSERT
+- [x] Control SQLCODE con mensajes de error
+- [x] Reporte paginado con cabecera/detalle/totales (WRITE FROM, AFTER ADVANCING)
+- [x] File status checks en OPEN/READ/CLOSE
+- [x] Archivo datos de prueba: 50 libros en DATOS_LIBROS.csv
+- `[-]` **TODO:** Validar código único antes del INSERT (SELECT previo)
+- `[-]` **TODO:** Validar año entre 1900 y 2100 (solo se valida NUMERIC)
+- `[-]` **TODO:** Validar stock > 0 (solo se valida NUMERIC)
+- `[-]` **TODO:** El formato de entrada es fixed-width pero DATOS_LIBROS.csv es comma-separated
 
-### 1.2 USUMANT - Mantenimiento de Usuarios `[x]`
-- **Entrada:** Archivo secuencial de novedades (Alta=A, Baja=B, Modificación=M)
-- **Salida:** Tabla USUARIOS actualizada + Reporte de proceso
-- **Validaciones:**
-  - Tipo de usuario válido (E=Estudiante, D=Docente, A=Administrativo)
-  - Formato de email (contiene @)
-  - Email único en la base (SELECT previo al INSERT)
-  - Campos obligatorios no vacíos (código, nombre, apellido)
-- **DB2:** EXEC SQL INSERT (alta), UPDATE (baja lógica con estado 'B'), UPDATE (modificación). Control de SQLCODE.
-- **Archivo:** `KC02814.GRUPO4.COBOL.SOURCE(USUMANT)`
+### 1.2 USUMANT - Mantenimiento de Usuarios `[-]`
+- [x] Estructura COBOL completa
+- [x] PERFORM UNTIL con lectura secuencial
+- [x] EXEC SQL INCLUDE SQLCA + host variables
+- [x] PROCESAR-ALTA: SELECT email único previo + INSERT + COMMIT
+- [x] PROCESAR-BAJA: UPDATE estado='B' + fecha_baja + COMMIT
+- [x] PROCESAR-MODIFICACION: UPDATE datos + COMMIT
+- [x] Validación tipo usuario (E/D/A)
+- [x] Validación formato email (contiene @)
+- [x] Validación campos obligatorios no vacíos
+- [x] Reporte paginado
+- [x] Archivo datos: 31 altas + 3 modif + 2 bajas
+- `[-]` **TODO:** PROCESAR-MODIFICACION no valida que el nuevo email no esté duplicado por otro usuario (SELECT WHERE EMAIL=X AND CODIGO<>Y)
 
-### 1.3 PRESTAM - Procesamiento de Préstamos y Devoluciones `[x]`
-- **Entrada:** Archivo de transacciones (P=Préstamo, D=Devolución) con código usuario, código libro y fecha
-- **Salida:** Tablas PRESTAMOS y LIBROS actualizadas + Reporte
-- **Reglas de negocio implementadas en estructura:**
-  - Validación de existencia de usuario y libro
-  - Verificación de stock disponible
-  - Control de topes por tipo de usuario (Estudiante: 3, Docente: 10, Administrativo: 5)
-  - Cálculo de fecha límite según tipo (Estudiante: 15 días, Docente: 30 días, Administrativo: 20 días)
-  - Cálculo de multa por atraso ($50/día)
-  - No se permite préstamo si el usuario tiene libros vencidos
-- **DB2:** INSERT en PRESTAMOS, UPDATE de stock en LIBROS (disminuir al prestar, aumentar al devolver)
-- **Pendiente:** Cursores DB2 y cálculo de fechas marcados con TODO para completar en mainframe
-- **Archivo:** `KC02814.GRUPO4.COBOL.SOURCE(PRESTAM)`
+### 1.3 PRESTAM - Procesamiento de Préstamos `[-]`
+- [x] Estructura COBOL completa
+- [x] PERFORM UNTIL con EVALUATE TRUE para tipo transacción (P/D)
+- [x] EXEC SQL INCLUDE SQLCA + host variables COMP-3 declaradas
+- [x] Subrutinas definidas con PERFORM encadenado (VALIDAR-USUARIO, VALIDAR-LIBRO, etc.)
+- [x] Constantes de negocio disponibles via COPY CONSTANT
+- [x] Reporte paginado
+- [x] Archivo datos: 118 transacciones (préstamos y devoluciones)
+- `[ ]` **TODO:** VALIDAR-USUARIO: SELECT para verificar existencia y estado activo
+- `[ ]` **TODO:** VALIDAR-USUARIO: verificar que no tenga préstamos vencidos
+- `[ ]` **TODO:** VALIDAR-LIBRO: SELECT para verificar existencia, estado activo y stock > 0
+- `[ ]` **TODO:** VALIDAR-TOPE-USUARIO: SELECT COUNT(*) préstamos activos vs CONST-MAX-LIBROS
+- `[ ]` **TODO:** CALCULAR-FECHAS-PRESTAMO: sumar días según tipo usuario (15/20/30)
+- `[ ]` **TODO:** BUSCAR-PRESTAMO-PENDIENTE: SELECT préstamo activo para devolución
+- `[ ]` **TODO:** CALCULAR-MULTA: diferencia de fechas × CONST-MULTA-DIA
+- `[ ]` **TODO:** REGISTRAR-PRESTAMO-DB2: INSERT PRESTAMOS + UPDATE LIBROS stock -1 + COMMIT
+- `[ ]` **TODO:** REGISTRAR-DEVOLUCION-DB2: UPDATE PRESTAMOS + UPDATE LIBROS stock +1 + COMMIT
 
-### 1.4 REPORTES - Generación de Reportes Estadísticos `[x]`
-- **Entrada:** Tablas DB2 (parámetros de fecha al iniciar)
-- **Salida:** Reporte formateado de 133 columnas con 4 secciones:
-  1. Top 10 libros más prestados (JOIN LIBROS + PRESTAMOS, GROUP BY, ORDER BY DESC)
-  2. Usuarios con préstamos vencidos (JOIN USUARIOS + PRESTAMOS + LIBROS, filtro por estado y fecha)
-  3. Estadísticas mensuales (GROUP BY año/mes, COUNT préstamos, COUNT devoluciones, SUM multas)
-  4. Inventario por categoría (GROUP BY categoría, COUNT libros, SUM stock total, SUM disponible, diferencia)
-- **DB2:** Host variables declaradas para cada cursor. Cursores con consultas SQL completas en comentarios.
-- **Pendiente:** EXEC SQL DECLARE/OPEN/FETCH/CLOSE marcados con TODO para implementar en mainframe
-- **Archivo:** `KC02814.GRUPO4.COBOL.SOURCE(REPORTES)`
-
----
-
-## 2. PROGRAMAS CICS (COBOL + MAPAS BMS)
-
-### 2.1 BIBMENU - Menú Principal `[x]`
-- **Pantalla:** Título del sistema, 5 opciones (1-Consultas, 2-Usuarios, 3-Préstamos, 4-Reportes, X-Salir)
-- **Navegación:** XCTL a BIBCONS (opción 1), XCTL a BIBPRES (opción 3), mensaje informativo para opciones batch (2 y 4)
-- **Salida:** PF3 o X → SEND TEXT de despedida + RETURN
-- **Archivos:** `KC02814.GRUPO4.COBOL.SOURCE(BIBMENU)` + `KC02814.GRUPO4.BMS.SOURCE(BIBMENU)`
-
-### 2.2 BIBCONS - Consulta de Libros `[x]`
-- **Pantalla:** 4 campos de búsqueda (código, título, autor, categoría) + 10 líneas de resultados paginados
-- **Función:** Búsqueda interactiva con paginación (PF7=anterior, PF8=siguiente)
-- **Navegación:** PF3 → XCTL a BIBMENU
-- **Pendiente:** Cursores DB2 y lógica de paginación marcados con TODO para mainframe
-- **Archivos:** `KC02814.GRUPO4.COBOL.SOURCE(BIBCONS)` + `KC02814.GRUPO4.BMS.SOURCE(BIBCONS)`
-
-### 2.3 BIBPRES - Préstamos y Devoluciones `[x]`
-- **Pantalla:** Tipo de transacción (P/D), código de usuario, código de libro, área de mensajes
-- **Función:** Registro con validación en tiempo real contra DB2
-- **Navegación:** PF3 → XCTL a BIBMENU
-- **Pendiente:** Operaciones DB2 (SELECT/INSERT/UPDATE) marcadas con TODO para mainframe
-- **Archivos:** `KC02814.GRUPO4.COBOL.SOURCE(BIBPRES)` + `KC02814.GRUPO4.BMS.SOURCE(BIBPRES)`
+### 1.4 REPORTES - Generación de Reportes `[-]`
+- [x] Estructura COBOL completa
+- [x] EXEC SQL INCLUDE SQLCA
+- [x] Host variables declaradas para los 4 reportes
+- [x] 4 subrutinas de reporte definidas (PERFORM)
+- [x] Consultas SQL completas en comentarios (SELECT con JOIN, GROUP BY, ORDER BY)
+- [x] Reporte formateado con WRITE FROM
+- `[ ]` **TODO:** Implementar EXEC SQL DECLARE/OPEN/FETCH/CLOSE para cada cursor
+- `[ ]` **TODO:** Escribir líneas de detalle formateadas en cada FETCH loop
+- `[ ]` **TODO:** Leer parámetros de fecha (WS-FECHA-DESDE, WS-FECHA-HASTA) - la consigna pide "parámetros de fechas" como entrada
+- `[ ]` **TODO:** Los 4 reportes incrementan WS-CONT-REPORTES-GEN sin generar salida real
 
 ---
 
-## 3. BASE DE DATOS DB2
+## 2. PROGRAMAS CICS
 
-### 3.1 Infraestructura `[x]`
-| Objeto | Nombre | Detalle |
-|--------|--------|---------|
-| Database | UNLAM | Existente, administrada por Marista |
-| Storage Group | UNLAM | Volumen BIGDB5, VCAT DSND10 |
-| Tablespace USUARIOS | G4USU | PRIQTY 20, SECQTY 10, BP0, LOCKSIZE ROW |
-| Tablespace LIBROS | G4LIB | PRIQTY 20, SECQTY 10, BP0, LOCKSIZE ROW |
-| Tablespace PRESTAMOS | G4PRE | PRIQTY 20, SECQTY 10, BP0, LOCKSIZE ROW |
+### 2.1 BIBMENU - Menú Principal `[-]`
+- [x] Programa CICS con EVALUATE EIBAID (ENTER, CLEAR, PF3)
+- [x] EXEC CICS SEND MAP / RECEIVE MAP
+- [x] BMS con 5 opciones visibles: 1-Consultas, 2-Usuarios, 3-Préstamos, 4-Reportes, X-Salir
+- [x] XCTL a BIBCONS (opción 1) y BIBPRES (opción 3)
+- [x] Mensajes informativos para opciones batch (2 y 4)
+- [x] TERMINAR-TRANSACCION con SEND TEXT + RETURN
+- `[-]` **TODO:** Las opciones 2 y 4 no llaman a ningún programa (es correcto: son batch)
+- `[ ]` **TODO:** No se valida que la opción ingresada no esté vacía antes del EVALUATE
 
-### 3.2 Tablas `[x]`
-| Tabla | Columnas | Constraints |
-|-------|----------|-------------|
-| KC02814.USUARIOS | 10 columnas (CHAR y DECIMAL) | PK: USU_CODIGO, CK: USU_TIPO_USUARIO IN (E,D,A), CK: USU_ESTADO IN (A,I,B), UNIQUE INDEX: USU_EMAIL |
-| KC02814.LIBROS | 12 columnas (CHAR y DECIMAL) | PK: LIB_CODIGO, CK: LIB_ESTADO IN (A,I,B), CK: LIB_STOCK_DISPONIBLE <= LIB_STOCK_TOTAL |
-| KC02814.PRESTAMOS | 9 columnas (CHAR y DECIMAL) | PK: PRES_NUMERO, FK → USUARIOS, FK → LIBROS, CK: PRES_ESTADO IN (P,D,V) |
+### 2.2 BIBCONS - Consulta de Libros `[-]`
+- [x] Programa CICS con EVALUATE EIBAID
+- [x] BMS con 4 campos de búsqueda (CODIGO, TITULO, AUTOR, CATEG)
+- [x] BMS con 10 líneas de resultados (MENSAJE1..MENSAJE10)
+- [x] PF7/PF8 para paginación (anterior/siguiente)
+- [x] EXEC SQL INCLUDE SQLCA + host variables
+- [x] Estructura para paginación (DCL-PAGINA-ACTUAL, DCL-TOTAL-RESULTADOS)
+- `[ ]` **TODO:** RECEIVE MAP para leer los campos de búsqueda ingresados
+- `[ ]` **TODO:** Construir WHERE dinámico con los campos no vacíos
+- `[ ]` **TODO:** EXEC SQL DECLARE CURSOR con la consulta construida
+- `[ ]` **TODO:** EXEC SQL OPEN / FETCH 10 rows / CLOSE
+- `[ ]` **TODO:** Poblar MENSAJE1O..MENSAJE10O con los datos del FETCH
+- `[ ]` **TODO:** EXEC SQL SELECT COUNT(*) para calcular total de páginas
+- `[ ]` **TODO:** Lógica real de paginación (calcular offset, límites de página)
 
-### 3.3 Índices adicionales `[x]`
-- `ID4_PRES_USU_EST` sobre PRESTAMOS (PRES_CODIGO_USUARIO, PRES_ESTADO)
-- `ID4_PRES_LIB_EST` sobre PRESTAMOS (PRES_CODIGO_LIBRO, PRES_ESTADO)
-- `ID4_PRES_FECHA` sobre PRESTAMOS (PRES_FECHA_LIMITE, PRES_ESTADO)
-- `ID4_LIB_CATEGORIA` sobre LIBROS (LIB_CATEGORIA, LIB_ESTADO)
-- `ID4_LIB_AUTOR` sobre LIBROS (LIB_AUTOR)
-
-### 3.4 Secuencia `[x]`
-- `SEQ_PRESTAMOS`: START 1, INCREMENT 1, NOMAXVALUE, NOCYCLE, CACHE 20
-
-### 3.5 Permisos `[x]`
-- GRANT ALL ON TABLE + GRANT USAGE ON SEQUENCE a los 3 integrantes del grupo
-
-### 3.6 Scripts `[x]`
-- **Archivo:** `KC02814.GRUPO4.SQL.SOURCE(DDL_TABLAS)`
-
----
-
-## 4. COPYBOOKS (6 de 6)
-
-| Copybook | Estructura principal | Archivo |
-|----------|---------------------|---------|
-| **LIBROS** | Código X(10), título X(60), autor X(40), editorial X(30), año 9(4), categoría X(20), stock total 9(3), stock disponible 9(3), ubicación X(10), fecha alta X(10), usuario alta X(8), estado X(1) con 88 (A/I/B) | `COPYLIB(LIBROS)` |
-| **USUARIO** | Código X(10), nombre X(30), apellido X(30), tipo X(1) con 88 (E/D/A), email X(50), teléfono X(20), dirección X(60), fecha alta X(10), fecha baja X(10), estado X(1) con 88 (A/I) | `COPYLIB(USUARIO)` |
-| **PRESTAMO** | Número 9(8), cod libro X(10), cod usuario X(10), fecha préstamo X(10), fecha devolución X(10), fecha límite X(10), estado X(1) con 88 (P/D/V), multa 9(5)V99, observaciones X(100) | `COPYLIB(PRESTAMO)` |
-| **CONSTANT** | Nombre sistema, versión, universidad. Reglas: EST(3 libros/15 días), DOC(10/30), ADM(5/20), multa $50/día. Parámetros reportes. | `COPYLIB(CONSTANT)` |
-| **MENSAJES** | 8 mensajes de error + 4 mensajes informativos | `COPYLIB(MENSAJES)` |
-| **LINREP** | 3 cabeceras, separador, títulos de columnas, línea detalle libros, totales. Líneas de 133 caracteres. | `COPYLIB(LINREP)` |
+### 2.3 BIBPRES - Préstamos y Devoluciones `[-]`
+- [x] Programa CICS con EVALUATE EIBAID
+- [x] BMS con campos: TRATIPO (P/D), USUCODIGO, CODCODIGO, MSG
+- [x] EXEC CICS RECEIVE MAP con validación DFHRESP(NORMAL)
+- [x] EVALUATE TRUE para préstamo vs devolución
+- [x] EXEC SQL INCLUDE SQLCA + host variables
+- `[ ]` **TODO:** PROCESAR-PRESTAMO-CICS: validar usuario existe y activo
+- `[ ]` **TODO:** PROCESAR-PRESTAMO-CICS: validar libro existe, activo y con stock
+- `[ ]` **TODO:** PROCESAR-PRESTAMO-CICS: validar tope préstamos por tipo usuario
+- `[ ]` **TODO:** PROCESAR-PRESTAMO-CICS: verificar no tenga libros vencidos
+- `[ ]` **TODO:** PROCESAR-PRESTAMO-CICS: INSERT PRESTAMOS + UPDATE stock -1 + COMMIT
+- `[ ]` **TODO:** PROCESAR-DEVOLUCION-CICS: buscar préstamo pendiente
+- `[ ]` **TODO:** PROCESAR-DEVOLUCION-CICS: calcular multa si aplica
+- `[ ]` **TODO:** PROCESAR-DEVOLUCION-CICS: UPDATE PRESTAMOS + UPDATE stock +1 + COMMIT
 
 ---
 
-## 5. JCL (6 de 6)
+## 3. BASE DE DATOS DB2 `[-]`
 
-| JCL | Programa base | Función | Archivo |
-|-----|---------------|---------|---------|
-| **COMPCOB** | IGYWCLG | Compila, linkedita y ejecuta programas COBOL sin DB2 | `JCL.SOURCE(COMPCOB)` |
-| **COMPDB2** | DSNHPC + IGYCRCTL + IEWL | Precompila DB2, compila COBOL, linkedita. Genera LOAD + DBRM | `JCL.SOURCE(COMPDB2)` |
-| **RUNBATCH** | (genérico) | Ejecuta programa desde LOAD.LIBRARY con DDs de entrada/salida | `JCL.SOURCE(RUNBATCH)` |
-| **BINDRUN** | IKJEFT01 + (genérico) | BIND PLAN en DB2 + ejecución del programa | `JCL.SOURCE(BINDRUN)` |
-| **RUNSQL** | IKJEFT01 + DSNTEP2 | Ejecuta scripts SQL desde SYSIN vía DSNTEP2 | `JCL.SOURCE(RUNSQL)` |
-| **DROPALL** | IKJEFT01 + DSNTEP2 | Elimina todos los objetos DB2 del grupo en orden correcto | `JCL.SOURCE(DROPALL)` |
-
----
-
-## 6. ARCHIVOS DE DATOS DE PRUEBA (3 de 3)
-
-| Archivo | Contenido | Cantidad |
-|---------|-----------|----------|
-| `DATA.INPUT(DATOS_LIBROS)` | Libros de ejemplo con código, título, autor, editorial, año, categoría, stock, ubicación | 15 registros |
-| `DATA.INPUT(DATOS_USUARIOS)` | Transacciones de alta/baja/modificación de usuarios | 7 registros |
-| `DATA.INPUT(DATOS_PRESTAMOS)` | Transacciones de préstamo (P) y devolución (D) | 10 registros |
+- [x] DDL_TABLAS.sql: CREATE TABLESPACE G4USU, G4LIB, G4PRE IN UNLAM
+- [x] DDL_TABLAS.sql: CREATE TABLE USUARIOS (10 cols, PK, CK, UNIQUE INDEX)
+- [x] DDL_TABLAS.sql: CREATE TABLE LIBROS (12 cols, PK, CK)
+- [x] DDL_TABLAS.sql: CREATE TABLE PRESTAMOS (9 cols, PK, 2 FK, CK)
+- [x] DDL_TABLAS.sql: 5 índices adicionales para búsquedas
+- [x] DDL_TABLAS.sql: CREATE SEQUENCE SEQ_PRESTAMOS
+- [x] DDL_TABLAS.sql: GRANT permissions
+- `[-]` **TODO:** Triggers de auditoría no implementados (opcionales según consigna)
+- `[-]` **TODO:** No hay script DML con datos de prueba para insertar directamente
 
 ---
 
-## 7. ESTRUCTURA DE DATASETS
+## 4. JCL `[-]`
 
-| Dataset | Contenido | Miembros |
-|---------|-----------|----------|
-| `KC02814.COBOL.SOURCE` | Programas fuente COBOL | CARGINI, USUMANT, PRESTAM, REPORTES, BIBMENU, BIBCONS, BIBPRES |
-| `KC02814.COBOL.COPYLIB` | Copybooks | LIBROS, USUARIO, PRESTAMO, CONSTANT, MENSAJES, LINREP |
-| `KC02814.BMS.SOURCE` | Mapas CICS | BIBMENU, BIBCONS, BIBPRES |
-| `KC02814.JCL.SOURCE` | Scripts JCL | COMPCOB, COMPDB2, RUNBATCH, BINDRUN, RUNSQL, DROPALL |
-| `KC02814.SQL.SOURCE` | Scripts SQL | DDL_TABLAS |
-| `KC02814.DATA.INPUT` | Datos de prueba | DATOS_LIBROS, DATOS_USUARIOS, DATOS_PRESTAMOS |
-| `KC02814.LOAD.LIBRARY` | Programas compilados | (se completa al compilar) |
-| `KC02814.REPORTES.OUTPUT` | Reportes generados | (se completa al ejecutar) |
+- [x] COMPCOB.jcl: IGYWCLG para COBOL puro (CICS)
+- [x] COMPDB2.jcl: DSNHPC + IGYCRCTL + IEWL para COBOL+DB2
+- [x] RUNBATCH.jcl: ejecución batch genérica con ENTRADA/NOVEDAD/TRANSAC/REPORTE
+- [x] BINDRUN.jcl: BIND PLAN (DSN SYSTEM DBDG) + ejecución
+- [x] RUNSQL.jcl: IKJEFT01 + DSNTEP2 con STEPLIB correcto (DSND10.*) y PLAN(DSNTEP13)
+- [x] DROPALL.jcl: eliminación en orden FK→PK→SEQ
+- `[-]` **TODO:** DDs en RUNBATCH.jcl y BINDRUN.jcl están comentados (//*). Deben descomentarse según programa.
+- `[-]` **TODO:** COMPCOB.jcl usa IGYWCLG (compile+link+go). Para CICS debería usarse IGYWCL sin GO step.
 
 ---
 
-## 8. ORDEN DE EJECUCIÓN EN MAINFRAME
+## 5. COPYBOOKS `[x]`
 
-| Paso | JCL | Descripción |
-|------|-----|-------------|
-| 1 | `RUNSQL` | Crear tablespaces, tablas, índices, secuencia, permisos (una sola vez, el owner) |
-| 2 | `COMPDB2(CARGINI)` | Compilar programa de carga de libros |
-| 3 | `COMPDB2(USUMANT)` | Compilar programa de mantenimiento de usuarios |
-| 4 | `COMPDB2(PRESTAM)` | Compilar programa de préstamos |
-| 5 | `COMPDB2(REPORTES)` | Compilar programa de reportes |
-| 6 | `BINDRUN(CARGINI)` + `ENTRADA=DATOS_LIBROS` | Carga inicial de libros a DB2 |
-| 7 | `BINDRUN(USUMANT)` + `NOVEDAD=DATOS_USUARIOS` | Alta/baja/mod de usuarios |
-| 8 | `BINDRUN(PRESTAM)` + `TRANSAC=DATOS_PRESTAMOS` | Procesar préstamos y devoluciones |
-| 9 | `BINDRUN(REPORTES)` | Generar los 4 reportes estadísticos |
-| 10 | Probar CICS | Navegar BIBMENU → BIBCONS → BIBPRES |
+- [x] LIBROS: 01 LIBRO-RECORD con 12 campos + 3 88-levels (A/I/B)
+- [x] USUARIO: 01 USUARIO-RECORD con 10 campos + 5 88-levels (E/D/A, A/I/B)
+- [x] PRESTAMO: 01 PRESTAMO-RECORD con 9 campos + 3 88-levels (P/D/V)
+- [x] CONSTANT: reglas negocio (3/15, 10/30, 5/20, $50/día) + parámetros reportes
+- [x] MENSAJES: 8 errores + 4 informativos
+- [x] LINREP: cabeceras, separador, títulos, detalle libros, totales (133 chars)
 
 ---
 
-## 9. PENDIENTE PARA COMPLETAR
+## 6. MAPAS BMS `[x]`
 
-1. **Cursores DB2:** Los programas REPORTES, PRESTAM y BIBCONS tienen las consultas SQL definidas en comentarios. Falta implementar la apertura, fetch y cierre de cursores reales durante la fase de compilación en mainframe.
-2. **Cálculo de fechas COBOL:** PRESTAM requiere aritmética de fechas (sumar días a fecha actual) para calcular fecha límite según tipo de usuario.
-3. **Compilación y prueba:** Todo el código debe compilarse y ejecutarse en el entorno Marista (z/OS) para validar funcionamiento.
-4. **Testing formal:** Documentar casos de prueba con datos de entrada y capturas de pantalla de resultados.
-5. **Triggers de auditoría:** Opcionales. No implementados.
+- [x] BIBMENU: 5 opciones (1-4, X), campo OPCION, área mensajes, PF3/ENTER
+- [x] BIBCONS: 4 campos búsqueda, cabecera resultados, 10 líneas, PF3/PF7/PF8
+- [x] BIBPRES: tipo (P/D), código usuario, código libro, área mensajes, PF3/ENTER
+
+---
+
+## 7. DATOS DE PRUEBA `[x]`
+
+- [x] DATOS_LIBROS.csv: 50 libros, 14 categorías distintas
+- [x] DATOS_USUARIOS.csv: 31 altas + 3 modificaciones + 2 bajas (E/D/A)
+- [x] DATOS_PRESTAMOS.csv: 118 transacciones (préstamos P + devoluciones D) en junio 2026
+
+---
+
+## 8. RESUMEN DE PENDIENTES (TODOs en código)
+
+| # | Archivo | Descripción | Prioridad |
+|---|---------|-------------|-----------|
+| 1 | PRESTAM.CBL | Implementar 8 subrutinas de validación y DB2 | ALTA |
+| 2 | REPORTES.CBL | Implementar 4 cursores DB2 con OPEN/FETCH/CLOSE | ALTA |
+| 3 | BIBCONS.CBL | Implementar búsqueda DB2 con WHERE dinámico y paginación | ALTA |
+| 4 | BIBPRES.CBL | Implementar validación DB2 en tiempo real | ALTA |
+| 5 | CARGINI.CBL | Agregar validación código único, año, stock > 0 | MEDIA |
+| 6 | USUMANT.CBL | Validar email único en modificación | MEDIA |
+| 7 | JCLs | Descomentar DDs en RUNBATCH y BINDRUN | MEDIA |
+| 8 | REPORTES.CBL | Agregar entrada de parámetros de fecha | MEDIA |
+| 9 | DATOS_LIBROS.csv | Convertir CSV a fixed-width o modificar parsing COBOL | BAJA |
+| 10 | DDL_TABLAS.sql | Agregar triggers de auditoría (opcional) | BAJA |

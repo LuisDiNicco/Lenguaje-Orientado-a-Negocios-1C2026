@@ -54,14 +54,19 @@
                     PERFORM ENVIAR-MAPA-CON-DATOS
                WHEN EIBAID = DFHPF3
                     PERFORM VOLVER-AL-MENU
-               WHEN EIBAID = DFHPF7
-      *             TODO: LOGICA PAGINACION ANTERIOR
-                    MOVE 'PAGINACION EN DESARROLLO' TO MENSAJE10O
-                    PERFORM ENVIAR-MAPA-CON-DATOS
-               WHEN EIBAID = DFHPF8
-      *             TODO: LOGICA PAGINACION SIGUIENTE
-                    MOVE 'PAGINACION EN DESARROLLO' TO MENSAJE10O
-                    PERFORM ENVIAR-MAPA-CON-DATOS
+                WHEN EIBAID = DFHPF7
+       *             TODO: DCL-PAGINA-ACTUAL = DCL-PAGINA-ACTUAL - 1
+       *                   IF < 0 THEN MOVE 0
+       *                   PERFORM OBTENER-DATOS-DB2
+                     MOVE 'PAGINACION EN DESARROLLO' TO MENSAJE10O
+                     PERFORM ENVIAR-MAPA-CON-DATOS
+                WHEN EIBAID = DFHPF8
+       *             TODO: Calcular max paginas desde DCL-TOTAL-RESULTADOS
+       *                   DCL-PAGINA-ACTUAL = DCL-PAGINA-ACTUAL + 1
+       *                   IF > max THEN no avanzar
+       *                   PERFORM OBTENER-DATOS-DB2
+                     MOVE 'PAGINACION EN DESARROLLO' TO MENSAJE10O
+                     PERFORM ENVIAR-MAPA-CON-DATOS
                WHEN OTHER
                     MOVE 'TECLA NO VALIDA' TO MENSAJE10O
                     PERFORM ENVIAR-MAPA-CON-DATOS
@@ -73,21 +78,42 @@
                 LENGTH(1)
            END-EXEC.
 
-      *--------------------------------------------------------------
-      *   OBTENER DATOS DE DB2 Y LLENAR MAPA (MOCK)
-      *--------------------------------------------------------------
-       OBTENER-DATOS-DB2.
-           MOVE SPACES TO MENSAJE1O
-           MOVE SPACES TO MENSAJE2O
-           MOVE SPACES TO MENSAJE3O
-
-      *    TODO: AQUI DEBE IR LA LOGICA DE DB2 PARA TRAER LIBROS
-      *    EXEC SQL DECLARE CURSOR...
-      *    EXEC SQL OPEN...
-      *    EXEC SQL FETCH...
-
-           MOVE 'TODO: IMPLEMENTAR FETCH DB2 AQUI' TO MENSAJE1O
-           MOVE 'SIMULANDO LECTURA DE LIBROS...' TO MENSAJE2O.
+       *--------------------------------------------------------------
+       *   OBTENER DATOS DE DB2 Y LLENAR MAPA
+       *--------------------------------------------------------------
+        OBTENER-DATOS-DB2.
+       *    TODO: Leer campos de busqueda del mapa via RECEIVE MAP
+       *          MOVE CODIGOI TO DCL-CONS-CODIGO
+       *          MOVE TITULOI TO DCL-CONS-TITULO
+       *          MOVE AUTORI  TO DCL-CONS-AUTOR
+       *          MOVE CATEGI  TO DCL-CONS-CATEGORIA
+       *    TODO: Construir WHERE clause dinamico con los campos
+       *          no vacios concatenados con AND
+       *    TODO: EXEC SQL DECLARE C_CONS CURSOR FOR
+       *          SELECT LIB_CODIGO, LIB_TITULO, LIB_AUTOR,
+       *                 LIB_ANIO_PUBLICACION, LIB_STOCK_DISPONIBLE,
+       *                 LIB_UBICACION
+       *          FROM KC02814.LIBROS
+       *          WHERE LIB_ESTADO = 'A'
+       *            AND (LIB_CODIGO LIKE :host-codigo OR ...)
+       *          ORDER BY LIB_CODIGO
+       *    TODO: EXEC SQL OPEN C_CONS END-EXEC
+       *    TODO: Calcular offset segun DCL-PAGINA-ACTUAL
+       *    TODO: FETCH 10 rows y poblar MENSAJE1O..MENSAJE10O
+       *    TODO: EXEC SQL SELECT COUNT(*) para DCL-TOTAL-RESULTADOS
+       *    TODO: EXEC SQL CLOSE C_CONS END-EXEC
+            MOVE SPACES TO MENSAJE1O
+            MOVE SPACES TO MENSAJE2O
+            MOVE SPACES TO MENSAJE3O
+            MOVE SPACES TO MENSAJE4O
+            MOVE SPACES TO MENSAJE5O
+            MOVE SPACES TO MENSAJE6O
+            MOVE SPACES TO MENSAJE7O
+            MOVE SPACES TO MENSAJE8O
+            MOVE SPACES TO MENSAJE9O
+            MOVE SPACES TO MENSAJE10O
+            MOVE 'TODO: IMPLEMENTAR BUSQUEDA DB2 + PAGINACION'
+                  TO MENSAJE1O.
 
       *--------------------------------------------------------------
       *   ENVIAR MAPA A PANTALLA

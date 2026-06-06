@@ -10,6 +10,8 @@
 
        ENVIRONMENT DIVISION.
        CONFIGURATION SECTION.
+       SOURCE-COMPUTER. IBM-3090.
+       OBJECT-COMPUTER. IBM-3090.
        INPUT-OUTPUT SECTION.
        FILE-CONTROL.
            SELECT ARCHIVO-NOVEDADES ASSIGN TO NOVEDAD
@@ -305,6 +307,7 @@
            IF SQLCODE = 0
                ADD 1 TO WS-CONT-ALTAS
                DISPLAY 'ALTA OK: ' WS-NOV-CODIGO
+               EXEC SQL COMMIT END-EXEC
            ELSE
                MOVE 'N' TO WS-RESULTADO
                DISPLAY 'ERROR DB2 INSERT - SQLCODE: ' SQLCODE
@@ -326,14 +329,22 @@
            IF SQLCODE = 0
                ADD 1 TO WS-CONT-BAJAS
                DISPLAY 'BAJA OK: ' WS-NOV-CODIGO
+               EXEC SQL COMMIT END-EXEC
            ELSE
                MOVE 'N' TO WS-RESULTADO
                DISPLAY 'ERROR DB2 BAJA - SQLCODE: ' SQLCODE
                        ' USUARIO: ' WS-NOV-CODIGO
            END-IF.
       *
-       PROCESAR-MODIFICACION.
-           MOVE WS-NOV-NOMBRE            TO DCL-USU-NOMBRE
+        PROCESAR-MODIFICACION.
+       *    TODO: Validar que el nuevo email no pertenezca a otro usuario
+       *          EXEC SQL SELECT USU_CODIGO INTO :DCL-USU-CODIGO
+       *          FROM KC02814.USUARIOS
+       *          WHERE USU_EMAIL = :WS-NOV-EMAIL
+       *            AND USU_CODIGO <> :WS-NOV-CODIGO
+       *          END-EXEC.
+       *          IF SQLCODE = 0 THEN email duplicado, error.
+            MOVE WS-NOV-NOMBRE            TO DCL-USU-NOMBRE
            MOVE WS-NOV-APELLIDO          TO DCL-USU-APELLIDO
            MOVE WS-NOV-TIPO-USUARIO      TO DCL-USU-TIPO-USUARIO
            MOVE WS-NOV-EMAIL             TO DCL-USU-EMAIL
@@ -355,6 +366,7 @@
            IF SQLCODE = 0
                ADD 1 TO WS-CONT-MODIFICACIONES
                DISPLAY 'MODIFICACION OK: ' WS-NOV-CODIGO
+               EXEC SQL COMMIT END-EXEC
            ELSE
                MOVE 'N' TO WS-RESULTADO
                DISPLAY 'ERROR DB2 UPDATE - SQLCODE: ' SQLCODE
