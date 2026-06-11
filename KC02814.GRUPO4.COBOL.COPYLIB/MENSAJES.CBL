@@ -1,39 +1,34 @@
-      *****************************************************************
-      * COPYBOOK: MENSAJES                                            *
-      * PROPOSITO: MENSAJES DEL SISTEMA                               *
-      * AUTOR: GRUPO 4                                                *
-      * FECHA: 23/05/2026                                             *
-      * VERSION: 1.0                                                  *
-      *****************************************************************
-      *
-      * MENSAJES DE ERROR
-      *
-       01 MENSAJES-ERROR.
-          05 MSG-ERR-001              PIC X(60)
-             VALUE 'ERROR: CODIGO DE LIBRO INVALIDO O VACIO'.
-          05 MSG-ERR-002              PIC X(60)
-             VALUE 'ERROR: TITULO DE LIBRO REQUERIDO'.
-          05 MSG-ERR-003              PIC X(60)
-             VALUE 'ERROR: AUTOR REQUERIDO'.
-          05 MSG-ERR-004              PIC X(60)
-             VALUE 'ERROR: ANIO DE PUBLICACION INVALIDO'.
-          05 MSG-ERR-005              PIC X(60)
-             VALUE 'ERROR: STOCK DEBE SER NUMERICO Y POSITIVO'.
-          05 MSG-ERR-006              PIC X(60)
-             VALUE 'ERROR: LIBRO YA EXISTE EN EL SISTEMA'.
-          05 MSG-ERR-007              PIC X(60)
-             VALUE 'ERROR: USUARIO NO ENCONTRADO'.
-          05 MSG-ERR-008              PIC X(60)
-             VALUE 'ERROR: USUARIO TIENE PRESTAMOS PENDIENTES'.
-      *
-      * MENSAJES INFORMATIVOS
-      *
-       01 MENSAJES-INFO.
-          05 MSG-INFO-001             PIC X(60)
-             VALUE 'LIBRO CARGADO EXITOSAMENTE'.
-          05 MSG-INFO-002             PIC X(60)
-             VALUE 'USUARIO REGISTRADO EXITOSAMENTE'.
-          05 MSG-INFO-003             PIC X(60)
-             VALUE 'PRESTAMO REGISTRADO EXITOSAMENTE'.
-          05 MSG-INFO-004             PIC X(60)
-             VALUE 'DEVOLUCION PROCESADA EXITOSAMENTE'.
+000100*************************************************************
+000200* COPYBOOK: MENSAJES                                        *
+000300* PROPOSITO: MENSAJES DEL SISTEMA                          *
+000400* AUTOR: GRUPO 4 - ESTUDIANTE KC03B1D                                 *
+000500* FECHA: 10/06/2025                                           *
+000600*************************************************************
+000700*
+000800 01 MENSAJES-ERROR.
+000900     05 MSG-ERR-001    PIC X(60)
+001000         VALUE 'ERROR: CODIGO DE LIBRO INVALIDO O VACIO'.
+001100     05 MSG-ERR-002    PIC X(60)
+001200         VALUE 'ERROR: TITULO DE LIBRO REQUERIDO'.
+001300     05 MSG-ERR-003    PIC X(60)
+001400         VALUE 'ERROR: AUTOR REQUERIDO'.
+001500     05 MSG-ERR-004    PIC X(60)
+001600         VALUE 'ERROR: ANIO DE PUBLICACION INVALIDO'.
+001700     05 MSG-ERR-005    PIC X(60)
+001800         VALUE 'ERROR: STOCK DEBE SER NUMERICO Y POSITIVO'.
+001900     05 MSG-ERR-006    PIC X(60)
+002000         VALUE 'ERROR: LIBRO YA EXISTE EN EL SISTEMA'.
+002100     05 MSG-ERR-007    PIC X(60)
+002200         VALUE 'ERROR: USUARIO NO ENCONTRADO'.
+002300     05 MSG-ERR-008    PIC X(60)
+002400         VALUE 'ERROR: USUARIO TIENE PRESTAMOS PENDIENTES'.
+002500*
+002600 01 MENSAJES-INFO.
+002700     05 MSG-INFO-001   PIC X(60)
+002800         VALUE 'LIBRO CARGADO EXITOSAMENTE'.
+002900     05 MSG-INFO-002   PIC X(60)
+003000         VALUE 'USUARIO REGISTRADO EXITOSAMENTE'.
+003100     05 MSG-INFO-003   PIC X(60)
+003200         VALUE 'PRESTAMO REGISTRADO EXITOSAMENTE'.
+003300     05 MSG-INFO-004   PIC X(60)
+003400         VALUE 'DEVOLUCION PROCESADA EXITOSAMENTE'.

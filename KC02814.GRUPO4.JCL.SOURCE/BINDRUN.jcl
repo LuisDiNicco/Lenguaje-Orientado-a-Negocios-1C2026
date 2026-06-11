@@ -1,48 +1,47 @@
-//BINDRUN JOB 1,NOTIFY=&SYSUID,MSGLEVEL=(1,1),MSGCLASS=H
-//****************************************************************
-//* JCL: BINDRUN - BIND DE PLAN DB2 Y EJECUCION DE PROGRAMA     *
-//* DESCRIPCION: BINDEA EL PLAN DB2 Y EJECUTA EL PROGRAMA        *
-//* USO: REEMPLAZAR <PROGRAMA> POR EL NOMBRE DEL PROGRAMA        *
-//****************************************************************
-//*
-//* ---------------------------------------------------------------
-//* PASO 1: BIND DEL PLAN DB2
-//* ---------------------------------------------------------------
-//BIND     EXEC PGM=IKJEFT01,DYNAMNBR=20
-//STEPLIB  DD DSN=DSND10.SDSNLOAD,DISP=SHR
-//         DD DSN=DSND10.DBDG.SDSNEXIT,DISP=SHR
+//BINDRUN  JOB (UNLAM),'BIND Y RUN',CLASS=A,MSGCLASS=H,
+//         NOTIFY=&SYSUID
+//*==============================================================*
+//* JCL DE BIND Y EJECUCION DE PROGRAMA COBOL CON DB2           *
+//* SUBSISTEMA: DBDG    BASE DE DATOS: UNLAM                     *
+//*                                                             *
+//* CONSIDERACIONES:                                            *
+//* I)   REEMPLAZAR X POR EL NUMERO DE GRUPO EN TODOS LOS       *
+//*      DATASETS (GRUPOX)                                      *
+//* II)  REEMPLAZAR MIPROG POR EL NOMBRE DEL PROGRAMA           *
+//* III) EL PLAN SIGUE LA CONVENCION CURSOG0X DONDE X ES EL     *
+//*      NUMERO DE GRUPO (EJ: GRUPO 1 -> CURSOG01)              *
+//*      EL PLAN ES UNICO POR GRUPO - NO CAMBIAR ENTRE          *
+//*      EJECUCIONES DEL MISMO GRUPO                            *
+//* IV)  EL PASO LIMPIEZA BORRA EL REPORTE ANTERIOR - NORMAL    *
+//* V)   EJECUTAR COMPDB2 ANTES QUE ESTE JCL                    *
+//* VI)  NO MODIFICAR RECFM, LRECL NI BLKSIZE DEL REPORTE       *
+//*      ESTOS VALORES ESTAN VALIDADOS PARA ESTE ENTORNO        *
+//*==============================================================*
+//LIMPIEZA EXEC PGM=IDCAMS
 //SYSPRINT DD SYSOUT=*
-//SYSTERM  DD SYSOUT=*
-//SYSUDUMP DD SYSOUT=*
-//SYSOUT   DD SYSOUT=*
-//DBRMLIB  DD DSN=&SYSUID..DB2.DBRMLIB,DISP=SHR
+//SYSIN    DD *
+  DELETE KC03B1D.GRUPO4.REPORTES.OUTPUT
+  SET MAXCC = 0
+/*
+//STEP1    EXEC PGM=IKJEFT01,DYNAMNBR=20,COND=(4,LT)
+//STEPLIB  DD DSN=DSND10.SDSNLOAD,DISP=SHR
+//         DD DSN=KC02814.GRUPO4.LOAD.LIBRARY,DISP=SHR
+//DBRMLIB  DD DSN=KC02814.GRUPO4.DBRM,DISP=SHR
+//SYSTSPRT DD SYSOUT=*
 //SYSTSIN  DD *
-  DSN SYSTEM(DBDG)
-  BIND PLAN(<PROGRAMA>) -
-       MEMBER(<PROGRAMA>) -
-       ACTION(REPLACE) -
-       VALIDATE(BIND)
+DSN SYSTEM(DBDG)
+  BIND PLAN(CURSOG04) MEMBER(CARGINI) +
+      CURRENTDATA(NO) ACT(REP) ISO(CS) ENCODING(EBCDIC)
+  RUN PROGRAM(CARGINI) PLAN(CURSOG04) -
+      LIB('KC02814.GRUPO4.LOAD.LIBRARY')
   END
 /*
-//*
-//* ---------------------------------------------------------------
-//* PASO 2: EJECUCION DEL PROGRAMA
-//* ---------------------------------------------------------------
-//RUN      EXEC PGM=<PROGRAMA>,COND=(4,LT,BIND)
-//STEPLIB  DD DSN=&SYSUID..LOAD.LIBRARY,DISP=SHR
-//         DD DSN=DSND10.SDSNLOAD,DISP=SHR
-//         DD DSN=DSND10.DBDG.RUNLIB.LOAD,DISP=SHR
 //SYSPRINT DD SYSOUT=*
-//SYSTERM  DD SYSOUT=*
 //SYSUDUMP DD SYSOUT=*
-//*
-//* ---------------------------------------------------------------
-//*  ARCHIVOS DE ENTRADA Y SALIDA (SEGUN PROGRAMA)
-//* ---------------------------------------------------------------
-//*ENTRADA  DD DSN=&SYSUID..DATA.INPUT,DISP=SHR
-//*NOVEDAD  DD DSN=&SYSUID..DATA.INPUT,DISP=SHR
-//*TRANSAC  DD DSN=&SYSUID..DATA.INPUT,DISP=SHR
-//*REPORTE  DD DSN=&SYSUID..REPORTES.OUTPUT,DISP=(NEW,CATLG,DELETE),
-//*            RECFM=FB,LRECL=133,BLKSIZE=32000,
-//*            SPACE=(CYL,(1,1))
-//*
+//ENTRADA  DD DSN=KC02814.GRUPO4.DATA.INPUT,DISP=SHR
+//REPORTE  DD DSN=KC03B1D.GRUPO4.REPORTES.OUTPUT,
+//            DISP=(NEW,CATLG,DELETE),
+//            RECFM=FB,LRECL=134,BLKSIZE=1340,
+//            SPACE=(TRK,(5,5)),UNIT=SYSALLDA
+//SYSIN    DD *
+/*

@@ -1,34 +1,25 @@
-      *****************************************************************
-      * COPYBOOK: CONSTANT                                            *
-      * PROPOSITO: CONSTANTES DEL SISTEMA DE BIBLIOTECA               *
-      * AUTOR: GRUPO 4                                                *
-      * FECHA: 23/05/2026                                             *
-      * VERSION: 1.0                                                  *
-      *****************************************************************
-      *
-      * CONSTANTES GENERALES
-      *
-       01 CONSTANTES-SISTEMA.
-          05 CONST-NOMBRE-SISTEMA     PIC X(30)
-             VALUE 'SISTEMA BIBLIOTECA UNLAM'.
-          05 CONST-VERSION            PIC X(5) VALUE 'V1.0'.
-          05 CONST-UNIVERSIDAD        PIC X(40)
-             VALUE 'UNIVERSIDAD NACIONAL DE LA MATANZA'.
-      *
-       * CONSTANTES DE BUSINESS RULES (E=3/15, D=10/30, A=5/20)
-       *
-       01 CONSTANTES-NEGOCIO.
-           05 CONST-DIAS-PRESTAMO-EST  PIC 9(2) VALUE 15.
-           05 CONST-DIAS-PRESTAMO-DOC  PIC 9(2) VALUE 30.
-           05 CONST-DIAS-PRESTAMO-ADM  PIC 9(2) VALUE 20.
-           05 CONST-MAX-LIBROS-EST     PIC 9(2) VALUE 03.
-           05 CONST-MAX-LIBROS-DOC     PIC 9(2) VALUE 10.
-           05 CONST-MAX-LIBROS-ADM     PIC 9(2) VALUE 05.
-           05 CONST-MULTA-DIA          PIC 9(3)V99 VALUE 50.00.
-      *
-      * CONSTANTES DE REPORTES
-      *
-       01 CONSTANTES-REPORTE.
-          05 CONST-LINEAS-PAGINA      PIC 9(2) VALUE 60.
-          05 CONST-LINEAS-CABECERA    PIC 9(2) VALUE 05.
-          05 CONST-ANCHO-REPORTE      PIC 9(3) VALUE 133.
+000100*************************************************************
+000200* COPYBOOK: CONSTANT                                        *
+000300* PROPOSITO: CONSTANTES DEL SISTEMA DE BIBLIOTECA          *
+000400* AUTOR: GRUPO 4 - ESTUDIANTE KC03B1D                                 *
+000500* FECHA: 10/06/2026                                         *
+000600*************************************************************
+000700*
+000800 01 CONSTANTES-SISTEMA.
+000900     05 CONST-NOMBRE-SISTEMA    PIC X(30)
+001000         VALUE 'SISTEMA BIBLIOTECA UNLAM'.
+001100     05 CONST-VERSION           PIC X(5) VALUE 'V1.0'.
+001200     05 CONST-UNIVERSIDAD       PIC X(40)
+001300         VALUE 'UNIVERSIDAD NACIONAL DE LA MATANZA'.
+001400*
+001500 01 CONSTANTES-NEGOCIO.
+001600     05 CONST-DIAS-PRESTAMO-EST PIC 9(2) VALUE 15.
+001700     05 CONST-DIAS-PRESTAMO-DOC PIC 9(2) VALUE 30.
+001800     05 CONST-MAX-LIBROS-EST    PIC 9(2) VALUE 03.
+001900     05 CONST-MAX-LIBROS-DOC    PIC 9(2) VALUE 10.
+002000     05 CONST-MULTA-DIA         PIC 9(3)V99 VALUE 50.00.
+002100*
+002200 01 CONSTANTES-REPORTE.
+002300     05 CONST-LINEAS-PAGINA     PIC 9(2) VALUE 60.
+002400     05 CONST-LINEAS-CABECERA   PIC 9(2) VALUE 05.
+002500     05 CONST-ANCHO-REPORTE     PIC 9(3) VALUE 133.

@@ -1,50 +1,30 @@
-//COMPDB2 JOB 1,NOTIFY=&SYSUID,MSGLEVEL=(1,1),MSGCLASS=H
-//****************************************************************
-//* JCL: COMPDB2 - COMPILACION COBOL CON SQL EMBEBIDO (DB2)      *
-//* DESCRIPCION: PRECOMPILA, COMPILA, LINKEA PROGRAMA COBOL+DB2  *
-//* USO: REEMPLAZAR <PROGRAMA> POR EL NOMBRE DEL PROGRAMA        *
-//****************************************************************
+//COMPDB2  JOB (UNLAM),'COMPILAR COBOL+DB2',CLASS=A,MSGCLASS=H,
+//         NOTIFY=&SYSUID
 //*
-//* ---------------------------------------------------------------
-//* PASO 1: PRECOMPILACION DB2 (TRADUCE EXEC SQL A CALLS)
-//* ---------------------------------------------------------------
-//PC       EXEC PGM=DSNHPC,
-//         PARM='HOST(COB2)'
-//*
-//DBRMLIB  DD DSN=&SYSUID..DB2.DBRMLIB(<PROGRAMA>),DISP=SHR
-//STEPLIB  DD DSN=DSND10.SDSNLOAD,DISP=SHR
-//         DD DSN=DSND10.DBDG.SDSNEXIT,DISP=SHR
-//SYSPRINT DD SYSOUT=*
-//SYSTERM  DD SYSOUT=*
-//SYSUDUMP DD SYSOUT=*
-//SYSUT1   DD UNIT=SYSDA,SPACE=(800,(500,500))
-//SYSUT2   DD UNIT=SYSDA,SPACE=(800,(500,500))
-//SYSIN    DD DSN=&SYSUID..COBOL.SOURCE(<PROGRAMA>),DISP=SHR
-//SYSCIN   DD DSN=&SYSUID..DB2.SYSCIN(<PROGRAMA>),DISP=SHR
-//*
-//* INCLUIR SQLCA Y COPYBOOKS DB2
-//*
-//SYSLIB   DD DSN=&SYSUID..COBOL.COPYLIB,DISP=SHR
-//         DD DSN=DSND10.SDSNSAMP,DISP=SHR
-//*
-//* ---------------------------------------------------------------
-//* PASO 2: COMPILACION COBOL (CODIGO PRECOMPILADO)
-//* ---------------------------------------------------------------
-//COB      EXEC PGM=IGYCRCTL,COND=(4,LT,PC)
-//STEPLIB  DD DSN=IGY.SIGYCOMP,DISP=SHR
-//SYSPRINT DD SYSOUT=*
-//SYSTERM  DD SYSOUT=*
-//SYSIN    DD DSN=&SYSUID..DB2.SYSCIN(<PROGRAMA>),DISP=SHR
-//SYSLIB   DD DSN=&SYSUID..COBOL.COPYLIB,DISP=SHR
-//SYSLIN   DD DSN=&SYSUID..DB2.OBJ(<PROGRAMA>),DISP=SHR
-//*
-//* ---------------------------------------------------------------
-//* PASO 3: LINKEADO (GENERA EL EJECUTABLE)
-//* ---------------------------------------------------------------
-//LKED     EXEC PGM=IEWL,COND=(4,LT,COB)
-//SYSPRINT DD SYSOUT=*
-//SYSLMOD  DD DSN=&SYSUID..LOAD.LIBRARY(<PROGRAMA>),DISP=SHR
-//SYSLIB   DD DSN=DSND10.SDSNLOAD,DISP=SHR
-//SYSUT1   DD UNIT=SYSDA,SPACE=(CYL,(1,1))
-//SYSLIN   DD DSN=&SYSUID..DB2.OBJ(<PROGRAMA>),DISP=SHR
-//*
+//*==============================================================*
+//* JCL DE COMPILACION COBOL CON DB2                            *
+//* SUBSISTEMA: DBDG    BASE DE DATOS: UNLAM                    *
+//*                                                             *
+//* CONSIDERACIONES:                                            *
+//* I)   REEMPLAZAR X POR EL NUMERO DE GRUPO EN TODOS LOS       *
+//*      DATASETS (GRUPOX)                                      *
+//* II)  REEMPLAZAR MIPROG POR EL NOMBRE DEL PROGRAMA           *
+//*      (MAX 8 CARACTERES, SIN EXTENSION)                      *
+//* III) ESTE JCL SOLO COMPILA Y LINKEA - NO EJECUTA            *
+//*      PARA EJECUTAR USAR EL JCL BINDRUN                      *
+//* IV)  SI EL RC DEL PASO COBOL ES 8 O MENOS, LA LINKEDICION   *
+//*      CONTINUA. RC 12 O MAS INDICA ERROR GRAVE EN EL FUENTE  *
+//* V)   EL FUENTE DEBE ESTAR EN GRUPOX.COBOL.SOURCE            *
+//*      LOS COPYBOOKS EN GRUPOX.COBOL.COPYLIB                  *
+//*==============================================================*
+//COMPILE  EXEC IGYWCL,
+//         PARM.COBOL='SQL,RENT,OBJECT'
+//COBOL.STEPLIB DD DSN=IGY640.SIGYCOMP,DISP=SHR
+//              DD DSN=DSND10.SDSNLOAD,DISP=SHR
+//              DD DSN=DSND10.DBDG.SDSNEXIT,DISP=SHR
+//COBOL.SYSLIB  DD DSN=KC02814.GRUPO4.COBOL.COPYLIB,DISP=SHR
+//COBOL.SYSIN   DD DSN=KC02814.GRUPO4.COBOL.SOURCE(CARGINI),DISP=SHR
+//COBOL.DBRMLIB DD DSN=KC02814.GRUPO4.DBRM(CARGINI),DISP=SHR
+//LKED.SYSLIB   DD DSN=CEE.SCEELKED,DISP=SHR
+//              DD DSN=DSND10.SDSNLOAD,DISP=SHR
+//LKED.SYSLMOD  DD DSN=KC02814.GRUPO4.LOAD.LIBRARY(CARGINI),DISP=SHR
